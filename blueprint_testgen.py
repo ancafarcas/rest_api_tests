@@ -1,10 +1,13 @@
 import json
+
 from settings import (
     SERVER_URL, BLUEPRINT_URL, BLUEPRINT_PATH, IGNORE_ENDPOINTS)
 
 
 with open(BLUEPRINT_PATH, 'r') as f:
     json_blueprint = json.loads(f.read().replace(BLUEPRINT_URL, SERVER_URL))
+
+name_template = "test {resource_group} > {resource} > {action} > {example}"
 
 
 class meta_BlueprintTest(type):
@@ -18,8 +21,7 @@ class meta_BlueprintTest(type):
             for resource in resource_group["resources"]:
                 for action in resource["actions"]:
                     for example in action["examples"]:
-                        fname = "test {resource_group} > {resource} \
-> {action} > {example}".format(
+                        fname = name_template.format(
                             resource_group=resource_group["name"],
                             resource=resource["name"],
                             action=action["name"],
@@ -31,48 +33,55 @@ class meta_BlueprintTest(type):
         return tests_dict
 
     @classmethod
+    def prepare_request(cls, example):
+        try:
+            if len(example['requests']) > 1:
+                print('warn: Multiple requests, using first')
+            payload = json.loads(example['requests'][0]['body'])
+        except (ValueError, IndexError):
+            payload = {}
+        return payload
+
+    @classmethod
+    def prepare_response(cls, example):
+        if len(example['responses']) > 1:
+            print('warn: Multiple responses, using first')
+        code = json.loads(example['responses'][0]['name'])
+        try:
+            answer = json.loads(example['responses'][0]['body'])
+        except ValueError:
+            answer = None
+        headers = {h['name']: h['value']
+                   for h in example['responses'][0]['headers']}
+        return code, answer, headers
+
+    @classmethod
+    def prepare_endpoint(cls, resource, action):
+        # @TODO: add substitution for GET parameters
+        method = action['method']
+        if len(resource['parameters']) > 0:
+            parameters = {p['name']: p['example']
+                          for p in resource['parameters']}
+            uri = resource['uriTemplate'].format(**parameters)
+        else:
+            uri = resource['uriTemplate']
+        url = cls.server_url + uri
+        return method, url
+
+    @classmethod
     def build_test(cls, resource, action, example):
         def func(self):
             print()
-            # model
-            #try:
-            #    model = json.loads(resource['model']['body'])
-            #except (ValueError, KeyError):
-            #    model = {}
-
-            # request
-            try:
-                if len(example['requests']) > 1:
-                    print('warn: Multiple requests, using first')
-                payload = json.loads(example['requests'][0]['body'])
-            except (ValueError, IndexError):
-                payload = {}
-            # response
-            if len(example['responses']) > 1:
-                print('warn: Multiple responses, using first')
-            code = json.loads(example['responses'][0]['name'])
-            try:
-                answer = json.loads(example['responses'][0]['body'])
-            except ValueError:
-                answer = None
-            # endpoint @TODO: add substitution for GET parameters
-            method = action['method']
-            if len(resource['parameters']) > 0:
-                parameters = {p['name']: p['example']
-                              for p in resource['parameters']}
-                uri = resource['uriTemplate'].format(**parameters)
-            else:
-                uri = resource['uriTemplate']
-            url = cls.server_url + uri
-            headers = {'Authorization': self.token}
-            # executing @TODO: verify headers
+            payload = cls.prepare_request(example)
+            code, answer, headers = cls.prepare_response(example)
+            method, url = cls.prepare_endpoint(resource, action)
             print(url)
-            # @TODO: create special methods for requests
-            response = self.session.request(
-                method, url, data=json.dumps(payload), headers=headers,
-                verify=False)
-            self.assertEqual(code, response.status_code)
+            self.request(
+                method, url, data=json.dumps(payload))
+            self.expect_status(code)
+            for header, value in headers.items():
+                self.expect_header(header, value)
             if answer:
-                self.assertEqual(answer, json.loads(response.text))
+                self.assertEqual(answer, json.loads(self.response.text))
 
         return func

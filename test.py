@@ -1,12 +1,13 @@
-import unittest
-import json
 import requests
+from unittest import TestCase
+from unittest import main as start_tests
 
 from blueprint_testgen import meta_BlueprintTest
+from api_testclass import ApiTestCase
 from auth import log_in
 
 
-class BlueprintTestCase(unittest.TestCase, metaclass=meta_BlueprintTest):
+class BlueprintTestCase(TestCase, ApiTestCase, metaclass=meta_BlueprintTest):
 
     @classmethod
     def setUpClass(cls):
@@ -15,4 +16,4 @@ class BlueprintTestCase(unittest.TestCase, metaclass=meta_BlueprintTest):
         cls.token = log_in(session=cls.session)
 
 if __name__ == '__main__':
-    unittest.main(verbosity=2)
+    start_tests(verbosity=2)
