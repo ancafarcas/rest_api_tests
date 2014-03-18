@@ -36,10 +36,11 @@ class meta_BlueprintTest(type):
         def func(self):
             print()
             # model
-            try:
-                model = json.loads(resource['model']['body'])
-            except (ValueError, KeyError):
-                model = {}
+            #try:
+            #    model = json.loads(resource['model']['body'])
+            #except (ValueError, KeyError):
+            #    model = {}
+
             # request
             try:
                 if len(example['requests']) > 1:
@@ -58,7 +59,7 @@ class meta_BlueprintTest(type):
             # endpoint
             method = action["method"]
             if len(resource['parameters']) > 0:
-                parameters = {p['name']: model[p['name']]
+                parameters = {p['name']: p['example']
                               for p in resource['parameters']}
                 uri = resource['uriTemplate'].format(**parameters)
             else:
