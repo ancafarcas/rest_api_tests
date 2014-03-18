@@ -62,10 +62,11 @@ class meta_BlueprintTest(type):
             else:
                 uri = resource['uriTemplate']
             url = cls.server_url + uri
+            headers = {'Authorization': self.token}
             # executing @TODO: verify headers
             print(url)
-            response = self.session.request(method, url,
-                                            data=json.dumps(payload))
+            response = self.session.request(
+                method, url, data=json.dumps(payload), headers=headers)
             self.assertEqual(code, response.status_code)
             if answer:
                 self.assertEqual(answer, json.loads(response.text))
