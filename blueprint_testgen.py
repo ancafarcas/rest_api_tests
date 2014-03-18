@@ -17,7 +17,8 @@ class meta_BlueprintTest(type):
             for resource in resource_group["resources"]:
                 for action in resource["actions"]:
                     for example in action["examples"]:
-                        fname = "test {resource_group} > {resource} > {action} > {example}".format(
+                        fname = "test {resource_group} > {resource} \
+> {action} > {example}".format(
                             resource_group=resource_group["name"],
                             resource=resource["name"],
                             action=action["name"],
@@ -45,15 +46,15 @@ class meta_BlueprintTest(type):
             except (ValueError, IndexError):
                 payload = {}
             # response
+            if len(example['responses']) > 1:
+                print('warn: Multiple responses, using first')
             code = json.loads(example['responses'][0]['name'])
             try:
-                if len(example['responses']) > 1:
-                    print('warn: Multiple responses, using first')
                 answer = json.loads(example['responses'][0]['body'])
             except ValueError:
                 answer = None
-            # endpoint @TODO:add substitution for GET parameters
-            method = action["method"]
+            # endpoint @TODO: add substitution for GET parameters
+            method = action['method']
             if len(resource['parameters']) > 0:
                 parameters = {p['name']: p['example']
                               for p in resource['parameters']}
@@ -61,7 +62,7 @@ class meta_BlueprintTest(type):
             else:
                 uri = resource['uriTemplate']
             url = cls.server_url + uri
-            # executing
+            # executing @TODO: verify headers
             print(url)
             response = self.session.request(method, url,
                                             data=json.dumps(payload))
