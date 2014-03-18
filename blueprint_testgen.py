@@ -9,7 +9,7 @@ with open(BLUEPRINT_PATH, 'r') as f:
 
 class meta_BlueprintTest(type):
 
-    server_url = SERVER_URL
+    server_url = SERVER_URL.rstrip('/')
 
     @classmethod
     def __prepare__(mcls, name, bases):

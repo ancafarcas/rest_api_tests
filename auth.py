@@ -1,10 +1,13 @@
 from requests import Session
-from urllib.parse import urljoin
 import hashlib
 import hmac
 import json
 
 from settings import SERVER_URL, LOGIN, PASS
+
+
+server_url = SERVER_URL.rstrip('/')
+
 
 class ApiException(Exception):
     pass
@@ -29,7 +32,7 @@ def log_in(username=LOGIN, password=PASS, session=None):
     if session is None:
         session = Session()
 
-    step1_url = SERVER_URL + '/Security/Authentication'
+    step1_url = server_url + '/Security/Authentication'
     step1 = session.post(
         url=step1_url,
         data={
@@ -47,7 +50,7 @@ def log_in(username=LOGIN, password=PASS, session=None):
 
     hashed_token = hash_token(username, password, token)
 
-    step2_url = SERVER_URL + '/Security/Login'
+    step2_url = server_url + '/Security/Login'
     step2 = session.post(
         url=step2_url,
         data={
