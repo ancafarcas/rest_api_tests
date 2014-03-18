@@ -1,5 +1,6 @@
 import json
-from settings import SERVER_URL, BLUEPRINT_URL, BLUEPRINT_PATH
+from settings import (
+    SERVER_URL, BLUEPRINT_URL, BLUEPRINT_PATH, IGNORE_ENDPOINTS)
 
 
 with open(BLUEPRINT_PATH, 'r') as f:
@@ -24,8 +25,9 @@ class meta_BlueprintTest(type):
                             action=action["name"],
                             example=example["name"]
                         )
-                        tests_dict[fname] = mcls.build_test(
-                            resource, action, example)
+                        if resource['uriTemplate'] not in IGNORE_ENDPOINTS:
+                            tests_dict[fname] = mcls.build_test(
+                                resource, action, example)
         return tests_dict
 
     @classmethod
