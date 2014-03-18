@@ -1,18 +1,14 @@
-import unittest
 import json
-import requests
-
-from pprint import pprint
+from settings import SERVER_URL, BLUEPRINT_URL, BLUEPRINT_PATH
 
 
-SERVER_URL = 'http://superdesk.apiary.io'
-
-
-with open('./apiary.json', 'r') as f:
-    json_blueprint = json.loads(f.read())
+with open(BLUEPRINT_PATH, 'r') as f:
+    json_blueprint = json.loads(f.read().replace(BLUEPRINT_URL, SERVER_URL))
 
 
 class meta_BlueprintTest(type):
+
+    server_url = SERVER_URL
 
     @classmethod
     def __prepare__(mcls, name, bases):
@@ -56,7 +52,7 @@ class meta_BlueprintTest(type):
                 answer = json.loads(example['responses'][0]['body'])
             except ValueError:
                 answer = None
-            # endpoint
+            # endpoint @TODO:add substitution for GET parameters
             method = action["method"]
             if len(resource['parameters']) > 0:
                 parameters = {p['name']: p['example']
@@ -64,7 +60,7 @@ class meta_BlueprintTest(type):
                 uri = resource['uriTemplate'].format(**parameters)
             else:
                 uri = resource['uriTemplate']
-            url = SERVER_URL + uri
+            url = cls.server_url + uri
             # executing
             print(url)
             response = self.session.request(method, url,
@@ -74,14 +70,3 @@ class meta_BlueprintTest(type):
                 self.assertEqual(answer, json.loads(response.text))
 
         return func
-
-
-class BlueprintTestCase(unittest.TestCase, metaclass=meta_BlueprintTest):
-
-    @classmethod
-    def setUpClass(cls):
-        #auth will be here
-        cls.session = requests.Session()
-
-if __name__ == '__main__':
-    unittest.main(verbosity=2)
