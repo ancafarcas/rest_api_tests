@@ -37,7 +37,8 @@ def log_in(username=LOGIN, password=PASS, session=None):
         url=step1_url,
         data={
             'userName': username,
-        }
+        },
+        verify=False,
     )
     try:
         step1_answer = json.loads(step1.text)
@@ -57,7 +58,8 @@ def log_in(username=LOGIN, password=PASS, session=None):
             'UserName': username,
             'Token': token,
             'HashedToken': hashed_token
-        }
+        },
+        verify=False,
     )
     try:
         step2_answer = json.loads(step2.text)

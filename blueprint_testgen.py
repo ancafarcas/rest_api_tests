@@ -67,8 +67,10 @@ class meta_BlueprintTest(type):
             headers = {'Authorization': self.token}
             # executing @TODO: verify headers
             print(url)
+            # @TODO: create special methods for requests
             response = self.session.request(
-                method, url, data=json.dumps(payload), headers=headers)
+                method, url, data=json.dumps(payload), headers=headers,
+                verify=False)
             self.assertEqual(code, response.status_code)
             if answer:
                 self.assertEqual(answer, json.loads(response.text))
