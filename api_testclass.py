@@ -8,12 +8,14 @@ class ApiTestCase(object):
     server_url = SERVER_URL.rstrip('/')
 
     def request(self, method, uri, *args, **kwargs):
+        url = self.server_url + uri
+
         if 'headers' in kwargs:
             headers = kwargs.pop('headers')
         else:
             headers = {}
-        url = self.server_url + uri
         headers.update({'Authorization': self.token})
+
         self.response = self.session.request(
             method, url, *args,
             verify=False, headers=headers, **kwargs)
