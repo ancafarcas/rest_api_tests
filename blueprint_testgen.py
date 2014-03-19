@@ -12,8 +12,6 @@ name_template = "test {resource_group} > {resource} > {action} > {example}"
 
 class meta_BlueprintTest(type):
 
-    server_url = SERVER_URL.rstrip('/')
-
     @classmethod
     def __prepare__(mcls, name, bases):
         tests_dict = dict()
@@ -65,8 +63,7 @@ class meta_BlueprintTest(type):
             uri = resource['uriTemplate'].format(**parameters)
         else:
             uri = resource['uriTemplate']
-        url = cls.server_url + uri
-        return method, url
+        return method, uri
 
     @classmethod
     def build_test(cls, resource, action, example):
@@ -74,10 +71,10 @@ class meta_BlueprintTest(type):
             print()
             payload = cls.prepare_request(example)
             code, answer, headers = cls.prepare_response(example)
-            method, url = cls.prepare_endpoint(resource, action)
-            print(url)
+            method, uri = cls.prepare_endpoint(resource, action)
+            print(uri)
             self.request(
-                method, url, data=json.dumps(payload))
+                method, uri, data=json.dumps(payload))
             self.expect_status(code)
             for header, value in headers.items():
                 self.expect_header(header, value)

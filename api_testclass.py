@@ -1,19 +1,22 @@
 from unittest import TestCase
-
+from settings import SERVER_URL
 
 #class ApiTestCase(TestCase):  # should be object
 class ApiTestCase(object):
 
     response = None
+    server_url = SERVER_URL.rstrip('/')
 
-    def request(self, *args, **kwargs):
+    def request(self, method, uri, *args, **kwargs):
         if 'headers' in kwargs:
             headers = kwargs.pop('headers')
         else:
             headers = {}
+        url = self.server_url + uri
         headers.update({'Authorization': self.token})
         self.response = self.session.request(
-            *args, verify=False, headers=headers, **kwargs)
+            method, url, *args,
+            verify=False, headers=headers, **kwargs)
 
     def GET(self, *args, **kwargs):
         self.request('GET', *args, **kwargs)
