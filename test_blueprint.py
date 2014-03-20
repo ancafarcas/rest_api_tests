@@ -7,7 +7,8 @@ from api_testclass import ApiTestCase
 from auth import log_in
 
 
-class BlueprintTestCase(TestCase, ApiTestCase, metaclass=meta_BlueprintTest):
+class BlueprintTestCase(
+    TestCase, ApiTestCase, metaclass=meta_BlueprintTest):
 
     maxDiff = None
 
