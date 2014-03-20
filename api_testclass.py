@@ -5,8 +5,34 @@ from unittest import TestCase
 from settings import SERVER_URL
 
 
-#class ApiTestCase(TestCase):  # should be object
-class ApiTestCase(object):
+class Helpers():
+
+    def apply_path(self, json_dict, path):
+        if path:
+            path_elements = path.split('/')
+            for element in path_elements:
+                json_dict = json_dict[element]
+        return json_dict
+
+    def parse_json_input(self, json_dict):
+        if isinstance(json_dict, str) \
+           and ('{' in json_dict or '[' in json_dict):
+            try:
+                response_dict = json.loads(self.response.text)
+            except ValueError:
+                self.fail('You have provided not a valid JSON.')
+        return json_dict
+
+    def parse_json_response(self):
+        try:
+            response_dict = json.loads(self.response.text)
+        except ValueError:
+            self.fail('Response in not a valid JSON.')
+        return response_dict
+
+
+#class ApiTestCase(TestCase, Helpers):  # should be object; this line for cmplt
+class ApiTestCase(Helpers):
 
     session = None
     token = None
@@ -72,39 +98,27 @@ class ApiTestCase(object):
         checks if json response equals some json,
         path separated by slashes, ie 'foo/bar/spam'
         """
-        if isinstance(json_dict, str) \
-           and ('{' in json_dict or '[' in json_dict):
-            try:
-                response_dict = json.loads(self.response.text)
-            except ValueError:
-                self.fail('You have provided not a valid JSON.')
-        try:
-            response_dict = json.loads(self.response.text)
-        except ValueError:
-            self.fail('Response in not a valid JSON.')
-
-        if path:
-            path_elements = path.split('/')
-            for element in path_elements:
-                response_dict = response_dict[element]
+        json_dict = self.parse_json_input(json_dict)
+        response_dict = self.apply_path(self.parse_json_response(), path)
 
         if partly:
             if isinstance(json_dict, dict):
-                self.assertDictContainsSubset(json_dict, response_dict,
-                                              "JSON not matches")
+                self.assertDictContainsSubset(
+                    json_dict, response_dict, "JSON not matches")
             elif isinstance(json_dict, list):
-                self.assertIn(json_dict, response_dict,
-                              "JSON not matches")
+                self.assertIn(
+                    json_dict, response_dict, "JSON not matches")
         else:
             if isinstance(json_dict, dict):
-                self.assertDictEqual(json_dict, response_dict,
-                                     "JSON not matches")
+                self.assertDictEqual(
+                    json_dict, response_dict, "JSON not matches")
             elif isinstance(json_dict, list):
-                self.assertEqual(json_dict, response_dict,
-                                 "JSON not matches")
+                self.assertEqual(
+                    json_dict, response_dict, "JSON not matches")
+
         if isinstance(json_dict, str):
-            self.assertEqual(json_dict, response_dict,
-                             "JSON not matches")
+            self.assertEqual(
+                json_dict, response_dict, "JSON not matches")
 
     def expect_json_contains(self, json_dict, path=None):
         """
