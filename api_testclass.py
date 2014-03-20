@@ -129,3 +129,11 @@ class ApiTestCase(Helpers):
         path separated by slashes, ie 'foo/bar/spam'
         """
         self.expect_json(json_input, path, partly=True)
+
+    def expect_json_length(self, length, path=None):
+        """
+        checks if count of objects in json response equals provided length,
+        path separated by slashes, ie 'foo/bar/spam'
+        """
+        json_response = self.apply_path(self.parse_json_response(), path)
+        self.assertEqual(length, len(json_response))
