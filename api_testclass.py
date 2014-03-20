@@ -11,7 +11,10 @@ class Helpers():
         if path:
             path_elements = path.split('/')
             for element in path_elements:
-                json_dict = json_dict[element]
+                try:
+                    json_dict = json_dict[element]
+                except (IndexError, TypeError):
+                    self.fail("Path can't be applied")
         return json_dict
 
     def parse_json_input(self, json_dict):
