@@ -1,20 +1,33 @@
+import json
+from requests import Session
 from unittest import TestCase
+
 from settings import SERVER_URL
+
 
 #class ApiTestCase(TestCase):  # should be object
 class ApiTestCase(object):
 
+    session = None
+    token = None
     response = None
     server_url = SERVER_URL.rstrip('/')
 
-    def request(self, method, uri, *args, **kwargs):
-        url = self.server_url + uri
+    def request(self, method, uri, *args, add_server=True, **kwargs):
+        if not self.session:
+            self.session = Session()
 
-        if 'headers' in kwargs:
-            headers = kwargs.pop('headers')
+        if add_server:
+            url = self.server_url + uri
         else:
-            headers = {}
-        headers.update({'Authorization': self.token})
+            url = uri
+
+        if self.token:
+            if 'headers' in kwargs:
+                headers = kwargs.pop('headers')
+            else:
+                headers = {}
+            headers.update({'Authorization': self.token})
 
         self.response = self.session.request(
             method, url, *args,
@@ -39,10 +52,63 @@ class ApiTestCase(object):
         self.assertEqual(code, self.response.status_code,
                          "Status code not matches.")
 
-    def expect_header(self, header, value):
+    def expect_header(self, header, value, partly=False):
         headers_low = {k.lower(): v.lower()
                        for k, v in self.response.headers.items()}
         self.assertIn(header.lower(), headers_low,
                       "No such header in response.")
-        self.assertEqual(value.lower(), headers_low[header.lower()],
-                         "Header not matches.")
+        if partly:
+            self.assertIn(value.lower(), headers_low[header.lower()],
+                          "Header not matches.")
+        else:
+            self.assertEqual(value.lower(), headers_low[header.lower()],
+                             "Header not matches.")
+
+    def expect_header_contains(self, header, value):
+        self.expect_header(header, value, partly=True)
+
+    def expect_json(self, json_dict, path=None, partly=False):
+        """
+        checks if json response equals some json,
+        path separated by slashes, ie 'foo/bar/spam'
+        """
+        if isinstance(json_dict, str) \
+           and ('{' in json_dict or '[' in json_dict):
+            try:
+                response_dict = json.loads(self.response.text)
+            except ValueError:
+                self.fail('You have provided not a valid JSON.')
+        try:
+            response_dict = json.loads(self.response.text)
+        except ValueError:
+            self.fail('Response in not a valid JSON.')
+
+        if path:
+            path_elements = path.split('/')
+            for element in path_elements:
+                response_dict = response_dict[element]
+
+        if partly:
+            if isinstance(json_dict, dict):
+                self.assertDictContainsSubset(json_dict, response_dict,
+                                              "JSON not matches")
+            elif isinstance(json_dict, list):
+                self.assertIn(json_dict, response_dict,
+                              "JSON not matches")
+        else:
+            if isinstance(json_dict, dict):
+                self.assertDictEqual(json_dict, response_dict,
+                                     "JSON not matches")
+            elif isinstance(json_dict, list):
+                self.assertEqual(json_dict, response_dict,
+                                 "JSON not matches")
+        if isinstance(json_dict, str):
+            self.assertEqual(json_dict, response_dict,
+                             "JSON not matches")
+
+    def expect_json_contains(self, json_dict, path=None):
+        """
+        checks if json response contains some json subset,
+        path separated by slashes, ie 'foo/bar/spam'
+        """
+        self.expect_json(json_dict, path, partly=True)

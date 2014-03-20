@@ -9,6 +9,8 @@ from auth import log_in
 
 class BlueprintTestCase(TestCase, ApiTestCase, metaclass=meta_BlueprintTest):
 
+    maxDiff = None
+
     @classmethod
     def setUpClass(cls):
         #auth will be here
