@@ -14,7 +14,6 @@ class BlueprintTestCase(
 
     @classmethod
     def setUpClass(cls):
-        #auth will be here
         cls.session = requests.Session()
         cls.token = log_in(session=cls.session)
 

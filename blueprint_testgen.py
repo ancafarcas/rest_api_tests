@@ -79,6 +79,6 @@ class meta_BlueprintTest(type):
             for header, value in headers.items():
                 self.expect_header(header, value)
             if answer:
-                self.assertEqual(answer, json.loads(self.response.text))
+                self.expect_json(answer)
 
         return func
