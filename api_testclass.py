@@ -136,4 +136,9 @@ class ApiTestCase(Helpers):
         path separated by slashes, ie 'foo/bar/spam'
         """
         json_response = self.apply_path(self.parse_json_response(), path)
-        self.assertEqual(length, len(json_response))
+        self.assertEqual(length, len(json_response),
+                         "JSON objects count not matches.")
+
+    def expect_body_contains(self, body):
+        self.assertIn(body, self.response.text,
+                      "Body not matches.")
