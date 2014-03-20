@@ -93,36 +93,36 @@ class ApiTestCase(Helpers):
     def expect_header_contains(self, header, value):
         self.expect_header(header, value, partly=True)
 
-    def expect_json(self, json_dict, path=None, partly=False):
+    def expect_json(self, json_input, path=None, partly=False):
         """
         checks if json response equals some json,
         path separated by slashes, ie 'foo/bar/spam'
         """
-        json_dict = self.parse_json_input(json_dict)
-        response_dict = self.apply_path(self.parse_json_response(), path)
+        json_input = self.parse_json_input(json_input)
+        json_response = self.apply_path(self.parse_json_response(), path)
 
         if partly:
-            if isinstance(json_dict, dict):
+            if isinstance(json_input, dict):
                 self.assertDictContainsSubset(
-                    json_dict, response_dict, "JSON not matches")
-            elif isinstance(json_dict, list):
+                    json_input, json_response, "JSON not matches")
+            elif isinstance(json_input, list):
                 self.assertIn(
-                    json_dict, response_dict, "JSON not matches")
+                    json_input, json_response, "JSON not matches")
         else:
-            if isinstance(json_dict, dict):
+            if isinstance(json_input, dict):
                 self.assertDictEqual(
-                    json_dict, response_dict, "JSON not matches")
-            elif isinstance(json_dict, list):
+                    json_input, json_response, "JSON not matches")
+            elif isinstance(json_input, list):
                 self.assertEqual(
-                    json_dict, response_dict, "JSON not matches")
+                    json_input, json_response, "JSON not matches")
 
-        if isinstance(json_dict, str):
+        if isinstance(json_input, str):
             self.assertEqual(
-                json_dict, response_dict, "JSON not matches")
+                json_input, json_response, "JSON not matches")
 
-    def expect_json_contains(self, json_dict, path=None):
+    def expect_json_contains(self, json_input, path=None):
         """
         checks if json response contains some json subset,
         path separated by slashes, ie 'foo/bar/spam'
         """
-        self.expect_json(json_dict, path, partly=True)
+        self.expect_json(json_input, path, partly=True)
