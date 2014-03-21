@@ -35,9 +35,6 @@ def log_in(username=LOGIN, password=PASS, session=None):
     step1_url = server_url + '/Security/Authentication'
     step1 = session.post(
         url=step1_url,
-        data={
-            'userName': username,
-        },
         verify=False,
     )
     try:

@@ -111,17 +111,22 @@ class ApiTestCase(Helpers):
             method, url, *args,
             verify=False, headers=headers, **kwargs)
 
+    def request_with_data(self, method,  uri, data='', *args, **kwargs):
+        if isinstance(data, dict) or isinstance(data, list):
+            data = json.dumps(data)
+        self.request(method, uri, *args, data=data, **kwargs)
+
     def GET(self, *args, **kwargs):
         self.request('GET', *args, **kwargs)
 
     def POST(self, *args, **kwargs):
-        self.request('POST', *args, **kwargs)
+        self.request_with_data('POST', *args, **kwargs)
 
     def PATCH(self, *args, **kwargs):
-        self.request('PATCH', *args, **kwargs)
+        self.request_with_data('PATCH', *args, **kwargs)
 
     def PUT(self, *args, **kwargs):
-        self.request('PUT', *args, **kwargs)
+        self.request_with_data('PUT', *args, **kwargs)
 
     def DELETE(self, *args, **kwargs):
         self.request('DELETE', *args, **kwargs)
@@ -192,9 +197,13 @@ class ApiTestCase(Helpers):
         self.assertIn(body, self.response.text,
                       "Body not matches.")
 
-    def inspect_json(self):
+    @property
+    def json_response(self):
         json_dict = self.parse_json_response()
-        pprint(json_dict)
+        return json_dict
+
+    def inspect_json(self):
+        pprint(self.json_response)
 
     def inspect_body(self):
         print(self.response.text)

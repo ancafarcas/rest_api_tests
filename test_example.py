@@ -2,8 +2,7 @@ from unittest import TestCase
 from unittest import main as start_tests
 from urllib.parse import quote
 
-from api_testclass import ApiTestCase
-from auth import log_in
+from api_testclass import ApiTestCase, ApiTestRunner
 
 
 class ExampleTestCase(TestCase, ApiTestCase):
@@ -11,7 +10,7 @@ class ExampleTestCase(TestCase, ApiTestCase):
     def test_filter_by_fullname(self):
         self.GET('/HR/User/?fullName={fullname}'
                  .format(fullname=quote('Gerald Durrell')))
-        print(self.response.text)
+        self.inspect_json()
 
     def test_expect_json(self):
         self.GET('http://httpbin.org/get?foo=bar&bar=baz', add_server=False)
@@ -20,5 +19,6 @@ class ExampleTestCase(TestCase, ApiTestCase):
         self.expect_json_contains({'args': {'foo': 'bar', 'bar': 'baz'}},)
         self.expect_json_contains({'args': {'foo': 'b1r', 'bar': 'b2z'}},)
 
+# those lines shouldn't be in actual testcase:
 if __name__ == '__main__':
-    start_tests(verbosity=2)
+    start_tests(verbosity=2, testRunner=ApiTestRunner)
