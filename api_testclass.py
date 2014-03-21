@@ -1,6 +1,7 @@
 import json
 from requests import Session
 from termcolor import colored
+from pprint import pprint
 from unittest import TestCase, TextTestResult, TextTestRunner
 
 from auth import log_in
@@ -95,13 +96,13 @@ class ApiTestCase(Helpers):
         else:
             url = uri
 
+        if 'headers' in kwargs:
+            headers = kwargs.pop('headers')
+        else:
+            headers = {}
         if with_auth:
             if not self.token:
                 self.token = log_in(session=self.session)
-            if 'headers' in kwargs:
-                headers = kwargs.pop('headers')
-            else:
-                headers = {}
             headers.update({'Authorization': self.token})
 
         if PRINT_URL and VERBOSITY == 2:
@@ -190,3 +191,16 @@ class ApiTestCase(Helpers):
     def expect_body_contains(self, body):
         self.assertIn(body, self.response.text,
                       "Body not matches.")
+
+    def inspect_json(self):
+        json_dict = self.parse_json_response()
+        pprint(json_dict)
+
+    def inspect_body(self):
+        print(self.response.text)
+
+    def inspect_code(self):
+        print(self.response.status_code)
+
+    def inspect_headers(self):
+        pprint(self.response.headers)
