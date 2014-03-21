@@ -1,4 +1,3 @@
-import requests
 from unittest import TestCase
 from unittest import main as start_tests
 from urllib.parse import quote
@@ -8,13 +7,6 @@ from auth import log_in
 
 
 class ExampleTestCase(TestCase, ApiTestCase):
-
-    maxDiff = None
-
-    @classmethod
-    def setUpClass(cls):
-        cls.session = requests.Session()
-        cls.token = log_in(session=cls.session)
 
     def test_filter_by_fullname(self):
         self.GET('/HR/User/?fullName={fullname}'

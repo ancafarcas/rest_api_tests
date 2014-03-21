@@ -3,6 +3,7 @@ from requests import Session
 from termcolor import colored
 from unittest import TestCase, TextTestResult, TextTestRunner
 
+from auth import log_in
 from settings import SERVER_URL, PRINT_URL, XML_OUTPUT, VERBOSITY
 
 
@@ -77,6 +78,8 @@ class Helpers():
 #class ApiTestCase(TestCase, Helpers):  # should be object; this line for cmplt
 class ApiTestCase(Helpers):
 
+    maxDiff = None
+
     session = None
     token = None
     response = None
@@ -92,7 +95,9 @@ class ApiTestCase(Helpers):
         else:
             url = uri
 
-        if self.token and with_auth:
+        if with_auth:
+            if not self.token:
+                self.token = log_in(session=self.session)
             if 'headers' in kwargs:
                 headers = kwargs.pop('headers')
             else:
