@@ -18,7 +18,7 @@ class ExampleTestCase(TestCase, ApiTestCase):
                    )},
                   with_auth=False)
         self.inspect_code()
-        self.inspect_body()
+        self.expect_json({"other":{"invalid":{"msg":"Invalid credentials"}}})
 
     def test_login_incorrect_token(self):
         self.POST('/Security/Login',
@@ -29,7 +29,7 @@ class ExampleTestCase(TestCase, ApiTestCase):
                    )},
                   with_auth=False)
         self.inspect_code()
-        self.inspect_body()
+        self.expect_json({"other":{"invalid":{"msg":"Invalid credentials"}}})
 
     def test_login_incorrect_hashed_token(self):
         self.POST('/Security/Authentication', with_auth=False)
@@ -39,4 +39,4 @@ class ExampleTestCase(TestCase, ApiTestCase):
                    'HashedToken': 'bc6adf5c3d7367a4ae4ce3ef6abe6024cd327f5d3ddaadff400d146126a16f96e4ae763a1bf1a858dad4701fecc35f73785cc397ac54487d30da3313a0d7e5f4'},
                   with_auth=False)
         self.inspect_code()
-        self.inspect_body()
+        self.expect_json({"other":{"invalid":{"msg":"Invalid credentials"}}})
