@@ -19,8 +19,7 @@ pip install -r requirements.txt
 python test_blueprint.py
 ```
 
-### run example of func tests:
+### run func tests:
 ```
-python test_example.py
+python test_runner.py
 ```
-or `nosetests` if installed

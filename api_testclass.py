@@ -1,8 +1,48 @@
 import json
 from requests import Session
-from unittest import TestCase
+from termcolor import colored
+from unittest import TestCase, TextTestResult, TextTestRunner
 
-from settings import SERVER_URL
+from settings import SERVER_URL, PRINT_URL, XML_OUTPUT, VERBOSITY
+
+
+class ApiTestResult(TextTestResult):
+
+    def startTest(self, test):
+        super(TextTestResult, self).startTest(test)
+        if self.showAll:
+            self.stream.writeln(colored('_' * 70, 'grey'))
+            self.stream.writeln(
+                colored(self.getDescription(test), 'magenta')
+            )
+
+    def addSuccess(self, test):
+        super(TextTestResult, self).addSuccess(test)
+        if self.showAll:
+            self.stream.writeln(colored("ok", 'green'))
+        elif self.dots:
+            self.stream.write(colored('.', 'green'))
+            self.stream.flush()
+
+    def addError(self, test, err):
+        super(TextTestResult, self).addError(test, err)
+        if self.showAll:
+            self.stream.writeln(colored("ERROR", 'yellow'))
+        elif self.dots:
+            self.stream.write(colored('E', 'yellow'))
+            self.stream.flush()
+
+    def addFailure(self, test, err):
+        super(TextTestResult, self).addFailure(test, err)
+        if self.showAll:
+            self.stream.writeln(colored("FAIL", 'red'))
+        elif self.dots:
+            self.stream.write(colored('F', 'red'))
+            self.stream.flush()
+
+
+class ApiTestRunner(TextTestRunner):
+    resultclass = ApiTestResult
 
 
 class Helpers():
@@ -42,7 +82,8 @@ class ApiTestCase(Helpers):
     response = None
     server_url = SERVER_URL.rstrip('/')
 
-    def request(self, method, uri, *args, add_server=True, **kwargs):
+    def request(self, method, uri, *args,
+                add_server=True, with_auth=True, **kwargs):
         if not self.session:
             self.session = Session()
 
@@ -51,13 +92,15 @@ class ApiTestCase(Helpers):
         else:
             url = uri
 
-        if self.token:
+        if self.token and with_auth:
             if 'headers' in kwargs:
                 headers = kwargs.pop('headers')
             else:
                 headers = {}
             headers.update({'Authorization': self.token})
 
+        if PRINT_URL and VERBOSITY == 2:
+            print('{method} {url}'.format(method=method, url=url))
         self.response = self.session.request(
             method, url, *args,
             verify=False, headers=headers, **kwargs)

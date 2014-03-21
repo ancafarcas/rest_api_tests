@@ -68,11 +68,9 @@ class meta_BlueprintTest(type):
     @classmethod
     def build_test(cls, resource, action, example):
         def func(self):
-            print()
             payload = cls.prepare_request(example)
             code, answer, headers = cls.prepare_response(example)
             method, uri = cls.prepare_endpoint(resource, action)
-            print(uri)
             self.request(
                 method, uri, data=json.dumps(payload))
             self.expect_status(code)

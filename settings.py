@@ -6,6 +6,10 @@ IGNORE_ENDPOINTS = ['/Security/Login', '/Security/Authentication', ]
 LOGIN = 'admin'
 PASS = 'admin'
 
+VERBOSITY = 2
+PRINT_URL = True
+XML_OUTPUT = False
+
 try:
     from settings_local import *
 except:
