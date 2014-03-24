@@ -19,6 +19,22 @@ class ExampleTestCase(TestCase, ApiTestCase):
         self.expect_json_contains({'args': {'foo': 'bar', 'bar': 'baz'}},)
         self.expect_json_contains({'args': {'foo': 'b1r', 'bar': 'b2z'}},)
 
+    def test_user_create_xfilter(self):
+        self.POST('/HR/User',
+                  """
+                  {
+                      "FirstName": "John",
+                      "LastName": "Doe",
+                      "UserName": "john12345",
+                      "EMail": "john1.doe2@email.com",
+                      "Password": "a3r546465676bgyhyyehy",
+                      "PhoneNumber":"0223456789"
+                 }
+                  """,
+                  headers={'X-Filter': 'User.UserName'})
+        self.inspect_code()
+        self.inspect_json()
+
 # those lines shouldn't be in actual testcase:
 if __name__ == '__main__':
     start_tests(verbosity=2, testRunner=ApiTestRunner)
