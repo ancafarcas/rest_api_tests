@@ -136,15 +136,15 @@ class ApiTestCase(Helpers):
                          "Status code not matches.")
 
     def expect_header(self, header, value, partly=False):
-        headers_low = {k.lower(): v.lower()
-                       for k, v in self.response.headers.items()}
-        self.assertIn(header.lower(), headers_low,
+        self.assertIn(header, self.response.headers,
                       "No such header in response.")
         if partly:
-            self.assertIn(value.lower(), headers_low[header.lower()],
+            self.assertIn(value.lower(),
+                          self.response.headers[header].lower(),
                           "Header not matches.")
         else:
-            self.assertEqual(value.lower(), headers_low[header.lower()],
+            self.assertEqual(value.lower(),
+                             self.response.headers[header].lower(),
                              "Header not matches.")
 
     def expect_header_contains(self, header, value):
@@ -212,4 +212,4 @@ class ApiTestCase(Helpers):
         print(self.response.status_code)
 
     def inspect_headers(self):
-        pprint(self.response.headers)
+        pprint(dict(self.response.headers))
