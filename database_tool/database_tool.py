@@ -24,7 +24,6 @@ except Exception:
 
 
 def initDB():
-    print(SQL_FILE)
     print('--------------------init db---------------------------')
     sqlFile = open(SQL_FILE, 'r')
     sqlScript = sqlFile.read()
