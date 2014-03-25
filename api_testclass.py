@@ -5,7 +5,8 @@ from pprint import pprint
 from unittest import TestCase, TextTestResult, TextTestRunner
 
 from auth import log_in
-from settings import SERVER_URL, PRINT_URL, XML_OUTPUT, VERBOSITY
+from settings import (
+    SERVER_URL, PRINT_URL, XML_OUTPUT, VERBOSITY, PRINT_PAYLOAD)
 
 
 class ApiTestResult(TextTestResult):
@@ -105,8 +106,11 @@ class ApiTestCase(Helpers):
                 self.token = log_in(session=self.session)
             headers.update({'Authorization': self.token})
 
-        if PRINT_URL and VERBOSITY == 2:
-            print('{method} {url}'.format(method=method, url=url))
+        if VERBOSITY == 2:
+            if PRINT_URL:
+                print('{method} {url}'.format(method=method, url=url))
+            if PRINT_PAYLOAD and 'data' in kwargs:
+                pprint(kwargs['data'])
         self.response = self.session.request(
             method, url, *args,
             verify=False, headers=headers, **kwargs)
@@ -206,7 +210,7 @@ class ApiTestCase(Helpers):
         pprint(self.json_response)
 
     def inspect_body(self):
-        print(self.response.text)
+        pprint(self.response.text)
 
     def inspect_status(self):
         print(self.response.status_code)

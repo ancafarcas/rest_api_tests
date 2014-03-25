@@ -8,6 +8,7 @@ PASS = 'admin'
 
 VERBOSITY = 2
 PRINT_URL = True
+PRINT_PAYLOAD = False
 XML_OUTPUT = False
 
 INIT_DB_CMD = "python database_tool/database_tool.py"
