@@ -208,7 +208,7 @@ class ApiTestCase(Helpers):
     def inspect_body(self):
         print(self.response.text)
 
-    def inspect_code(self):
+    def inspect_status(self):
         print(self.response.status_code)
 
     def inspect_headers(self):
