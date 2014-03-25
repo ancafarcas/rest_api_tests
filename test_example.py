@@ -32,7 +32,7 @@ class ExampleTestCase(TestCase, ApiTestCase):
                  }
                   """,
                   headers={'X-Filter': 'User.UserName'})
-        self.inspect_code()
+        self.inspect_status()
         self.inspect_json()
 
 # those lines shouldn't be in actual testcase:
