@@ -5,7 +5,7 @@ from api_testclass import ApiTestCase
 from settings import LOGIN, PASS
 
 
-class ExampleTestCase(TestCase, ApiTestCase):
+class LoginTestCase(TestCase, ApiTestCase):
 
     def test_login_incorrect_username(self):
         self.POST('/Security/Authentication', with_auth=False)
