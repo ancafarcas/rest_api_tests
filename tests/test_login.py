@@ -20,6 +20,18 @@ class ExampleTestCase(TestCase, ApiTestCase):
         self.inspect_code()
         self.expect_json({"other":{"invalid":{"msg":"Invalid credentials"}}})
 
+    def test_login_incorrect_password(self):
+        self.POST('/Security/Authentication', with_auth=False)
+        self.POST('/Security/Login',
+                  {'UserName': LOGIN,
+                   'Token': self.json_response['Token'],
+                   'HashedToken': hash_token(
+                       LOGIN, 'wrongpassworf', self.json_response['Token']
+                   )},
+                  with_auth=False)
+        self.inspect_code()
+        self.expect_json({"other":{"invalid":{"msg":"Invalid credentials"}}})
+
     def test_login_incorrect_token(self):
         self.POST('/Security/Login',
                   {'UserName': LOGIN,
