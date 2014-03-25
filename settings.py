@@ -10,6 +10,8 @@ VERBOSITY = 2
 PRINT_URL = True
 XML_OUTPUT = False
 
+INIT_DB_CMD = "python database_tool/database_tool.py"
+
 try:
     from settings_local import *
 except:
