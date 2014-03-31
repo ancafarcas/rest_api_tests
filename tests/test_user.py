@@ -30,27 +30,6 @@ class UserListTestCase(ApiTestCase):
         self.expect_status(201)
         self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})
          
-         
-        #add deleted one
-        self.DELETE('/HR/User/7')
-        self.expect_status(204)
-  
-        self.POST('/HR/User',
-          """
-          {
-              "FirstName": "John",
-              "LastName": "Doe",
-              "UserName": "john12345._-'",
-              "EMail": "john1.doe2@email.com",
-              "Password": "a3r546465676bgyhyyehy",
-              "PhoneNumber":"0223456789"
-         }
-          """,
-          headers={'X-Filter': 'User.UserName'})
-        self.expect_status(201)
-        self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})
-         
-         
     def test_add_user_already_deleted(self):
         #add user
         #TODO: check login
@@ -328,7 +307,8 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john1', 'href': self.server_url + '/HR/User/7'})
+        self.expect_json({'UserName': 'john1',
+                          'href': self.server_url + '/HR/User/7'})
            
         self.POST('/HR/User',
           """
@@ -343,9 +323,10 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john2', 'href': self.server_url + '/HR/User/11'})
+        self.expect_json({'UserName': 'john2',
+                          'href': self.server_url + '/HR/User/8'})
            
-        self.PUT('/HR/User/7', {"EMail": "john2.doe@email.com"}, headers={'X-Filter': 'User.UserName,User.EMail'})
+        self.PUT('/HR/User/8', {"EMail": "john2.doe@email.com"}, headers={'X-Filter': 'User.UserName,User.EMail'})
         self.expect_status(400)
         self.expect_json({'EMail': {'unique': {'msg': 'Unique constraint failed'}}})
           
@@ -476,25 +457,25 @@ class UserListTestCase(ApiTestCase):
            
     def test_delete_user(self):
         #check user not on list
-        self.GET('/HR/User/8')
+        self.GET('/HR/User/6')
         self.expect_status(200)
         self.inspect_headers()
         self.inspect_body()
            
         #delete success
-        self.DELETE('/HR/User/8')
+        self.DELETE('/HR/User/6')
         self.expect_status(204)
         self.inspect_headers()
         self.inspect_body()
    
         #delete again same response?
-        self.DELETE('/HR/User/8')
+        self.DELETE('/HR/User/6')
         self.expect_status(204)
         self.inspect_headers()
         self.inspect_body()
            
         #check user not exists
-        self.GET('/HR/User/8')
+        self.GET('/HR/User/6')
         self.expect_status(404)     
 
 
