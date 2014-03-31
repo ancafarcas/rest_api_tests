@@ -1,91 +1,77 @@
-'''
-Created on Mar 22, 2014
-
-@author: ioan
-'''
 from api_test_tool import ApiTestCase
 
-from tests import fixtures
+from tests import fixtures, session, token
+
 
 class UserListTestCase(ApiTestCase):
-    
+    session = session
+    token = token
+   
+
+    @classmethod
+    def setUpClass(cls):
+        cls.last_id = fixtures.last_id('/HR/User')
+        cls.record = """
+        {
+            "FirstName": "John",
+            "LastName": "Doe",
+            "UserName": "john12345._-'",
+            "EMail": "john1.doe2@email.com",
+            "Password": "a3r546465676bgyhyyehy",
+            "PhoneNumber":"0223456789"
+        }
+        """
+        cls.record_href = '{server}/HR/User/{id}'.format(
+            server=cls.server_url, id=cls.last_id+1)
+
+
     def setUp(self):
         fixtures.init('/HR/User')
+
             
     def test_add_user_success(self):
         #add user
         #TODO: check login
-        self.POST('/HR/User',
-          """
-          {
-              "FirstName": "John",
-              "LastName": "Doe",
-              "UserName": "john12345._-'",
-              "EMail": "john1.doe2@email.com",
-              "Password": "a3r546465676bgyhyyehy",
-              "PhoneNumber":"0223456789"
-         }
-          """,
+        self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})
+        self.expect_json({
+            'UserName': "john12345._-'",
+            'href': self.record_href
+        })
          
     def test_add_user_already_deleted(self):
         #add user
         #TODO: check login
-        self.POST('/HR/User',
-          """
-          {
-              "FirstName": "John",
-              "LastName": "Doe",
-              "UserName": "john12345._-'",
-              "EMail": "john1.doe2@email.com",
-              "Password": "a3r546465676bgyhyyehy",
-              "PhoneNumber":"0223456789"
-         }
-          """,
+        self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})
-         
+        self.expect_json({
+            'UserName': "john12345._-'",
+            'href': self.server_url + '/HR/User/7'
+        })
          
         #add deleted one
         self.DELETE('/HR/User/7')
         self.expect_status(204)
-        self.POST('/HR/User',
-          """
-          {
-              "FirstName": "John",
-              "LastName": "Doe",
-              "UserName": "john12345._-'",
-              "EMail": "john1.doe2@email.com",
-              "Password": "a3r546465676bgyhyyehy",
-              "PhoneNumber":"0223456789"
-         }
-          """,
+        self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})
-         
-         
+        self.expect_json({
+            'UserName': "john12345._-'",
+            'href': self.server_url + '/HR/User/7'
+        })
          
     def test_add_user_duplicate_username(self):
         #add user
         #TODO: check login
-        self.POST('/HR/User',
-          """
-          {
-              "FirstName": "John",
-              "LastName": "Doe",
-              "UserName": "john12345._-'",
-              "EMail": "john1.doe2@email.com",
-              "Password": "a3r546465676bgyhyyehy",
-              "PhoneNumber":"0223456789"
-         }
-          """,
+        self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})
+        self.expect_json({
+            'UserName': "john12345._-'",
+            'href': self.server_url + '/HR/User/7'
+        })
          
         #add duplicate username
         self.POST('/HR/User',
@@ -101,23 +87,17 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(400)
-        self.expect_json({'UserName': {'conflict': {'msg': 'There is already an active user with this name'}}})
+        self.expect_json(
+            {'UserName': {'conflict':
+              {'msg': 'There is already an active user with this name'}
+             }}
+        )
          
          
     def test_add_user_duplicate_email(self):
         #add user
         #TODO: check login
-        self.POST('/HR/User',
-          """
-          {
-              "FirstName": "John",
-              "LastName": "Doe",
-              "UserName": "john12345._-'",
-              "EMail": "john1.doe2@email.com",
-              "Password": "a3r546465676bgyhyyehy",
-              "PhoneNumber":"0223456789"
-         }
-          """,
+        self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
         self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})        
@@ -143,7 +123,7 @@ class UserListTestCase(ApiTestCase):
          
     def test_add_user_incorrect_username(self):        
         #add incorrect username
-        self.POST('/HR/User',
+        self.POST('/HR/User', self.record,
           """
           {
               "FirstName": "John",
@@ -208,6 +188,7 @@ class UserListTestCase(ApiTestCase):
         self.inspect_status()
         self.inspect_json()
          
+    def test_add_user_missing_email(self):        
         #add missing email
         self.POST('/HR/User',
           """
@@ -258,20 +239,11 @@ class UserListTestCase(ApiTestCase):
           
     def test_edit_user_success(self):
         #edit with success, check new values, check login
-        self.POST('/HR/User',
-          """
-          {
-              "FirstName": "John",
-              "LastName": "Doe",
-              "UserName": "john12345._-'",
-              "EMail": "john1.doe2@email.com",
-              "Password": "a3r546465676bgyhyyehy",
-              "PhoneNumber":"0223456789"
-         }
-          """,
+        self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})
+        self.expect_json({'UserName': "john12345._-'",
+                          'href': self.server_url + '/HR/User/7'})
  
         self.PUT('/HR/User/7',
           """
@@ -284,30 +256,22 @@ class UserListTestCase(ApiTestCase):
               "PhoneNumber":"+123123456789"
          }
           """,
-          headers={'X-Filter': 'User.UserName,User.FirstName,User.LastName,User.EMail,User.Password,User.PhoneNumber'})
+          headers={
+              'X-Filter': 'User.UserName,User.FirstName,User.LastName,User.EMa\
+il,User.Password,User.PhoneNumber'})
         self.expect_status(200)
-        self.expect_json({  'EMail': 'john1.doe2.changed@email.com',
-                             'FirstName': 'JohnChanged',
-                             'LastName': 'DoeChanged',
-                             'PhoneNumber': '+123123456789',
-                             'UserName': "john12345._-'changed",
-                             'href': self.server_url + '/HR/User/7'})
+        self.expect_json({'EMail': 'john1.doe2.changed@email.com',
+                          'FirstName': 'JohnChanged',
+                          'LastName': 'DoeChanged',
+                          'PhoneNumber': '+123123456789',
+                          'UserName': "john12345._-'changed",
+                          'href': self.server_url + '/HR/User/7'})
   
     def test_edit_user_duplicate_email(self):      
-        self.POST('/HR/User',
-          """
-          {
-              "FirstName": "John",
-              "LastName": "Doe",
-              "UserName": "john1",
-              "EMail": "john1.doe@email.com",
-              "Password": "a3r546465676bgyhyyehy",
-              "PhoneNumber":"0223456789"
-         }
-          """,
+        self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john1',
+        self.expect_json({'UserName': "john12345._-'",
                           'href': self.server_url + '/HR/User/7'})
            
         self.POST('/HR/User',
@@ -326,132 +290,87 @@ class UserListTestCase(ApiTestCase):
         self.expect_json({'UserName': 'john2',
                           'href': self.server_url + '/HR/User/8'})
            
-        self.PUT('/HR/User/8', {"EMail": "john1.doe@email.com"}, headers={'X-Filter': 'User.UserName,User.EMail'})
+        self.PUT('/HR/User/8', {"EMail": "john1.doe2@email.com"},
+                 headers={'X-Filter': 'User.UserName,User.EMail'})
         self.expect_status(400)
-        self.expect_json({'EMail': {'unique': {'msg': 'Unique constraint failed'}}})
+        self.expect_json(
+            {'EMail': {'unique':
+                       {'msg': 'Unique constraint failed'}
+        }})
           
     def test_edit_user_incorect_email(self):  
-        self.POST('/HR/User',
-          """
-          {
-              "FirstName": "John",
-              "LastName": "Doe",
-              "UserName": "john1",
-              "EMail": "john1.doe@email.com",
-              "Password": "a3r546465676bgyhyyehy",
-              "PhoneNumber":"0223456789"
-         }
-          """,
+        self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john1', 'href': self.server_url + '/HR/User/7'})
+        self.expect_json({'UserName': "john12345._-'",
+                          'href': self.server_url + '/HR/User/7'})
               
         self.PUT('/HR/User/7',{"EMail": ";john1.doe@email.com"})
         self.expect_status(400)
         self.expect_json({'EMail': {'format': {'msg': 'Invalid EMail'}}})        
      
     def test_edit_user_missing_first_name(self):  
-        self.POST('/HR/User',
-          """
-          {
-              "FirstName": "John",
-              "LastName": "Doe",
-              "UserName": "john1",
-              "EMail": "john1.doe@email.com",
-              "Password": "a3r546465676bgyhyyehy",
-              "PhoneNumber":"0223456789"
-         }
-          """,
+        self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john1', 'href': self.server_url + '/HR/User/7'})
+        self.expect_json({'UserName': "john12345._-'",
+                          'href': self.server_url + '/HR/User/7'})
                
-        self.PUT('/HR/User/7',{"FirstName": ""}, headers={'X-Filter': 'User.UserName,User.FirstName'})
+        self.PUT('/HR/User/7',{"FirstName": ""},
+                 headers={'X-Filter': 'User.UserName,User.FirstName'})
         self.inspect_status()
         self.inspect_json()       
  
           
     def test_edit_user_missing_last_name(self):  
-        self.POST('/HR/User',
-          """
-          {
-              "FirstName": "John",
-              "LastName": "Doe",
-              "UserName": "john1",
-              "EMail": "john1.doe@email.com",
-              "Password": "a3r546465676bgyhyyehy",
-              "PhoneNumber":"0223456789"
-         }
-          """,
+        self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john1', 'href': self.server_url + '/HR/User/7'})
+        self.expect_json({'UserName': "john12345._-'",
+                          'href': self.server_url + '/HR/User/7'})
                 
-        self.PUT('/HR/User/7',{"LastName": ""}, headers={'X-Filter': 'User.UserName,User.LastName'})
+        self.PUT('/HR/User/7',{"LastName": ""},
+                 headers={'X-Filter': 'User.UserName,User.LastName'})
         self.inspect_status()
         self.inspect_json()  
          
     def test_edit_user_missing_email(self):  
-        self.POST('/HR/User',
-          """
-          {
-              "FirstName": "John",
-              "LastName": "Doe",
-              "UserName": "john1",
-              "EMail": "john1.doe@email.com",
-              "Password": "a3r546465676bgyhyyehy",
-              "PhoneNumber":"0223456789"
-         }
-          """,
+        self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john1', 'href': self.server_url + '/HR/User/7'})
+        self.expect_json({'UserName': "john12345._-'",
+                          'href': self.server_url + '/HR/User/7'})
                  
-        self.PUT('/HR/User/7',{"EMail": ""}, headers={'X-Filter': 'User.UserName,User.EMail'})
+        self.PUT('/HR/User/7',{"EMail": ""},
+                 headers={'X-Filter': 'User.UserName,User.EMail'})
         self.expect_status(400)
         self.inpect_json({'EMail': {'format': {'msg': 'Invalid EMail'}}})
           
     def test_edit_user_missing_phone(self):  
-        self.POST('/HR/User',
-          """
-          {
-              "FirstName": "John",
-              "LastName": "Doe",
-              "UserName": "john1",
-              "EMail": "john1.doe@email.com",
-              "Password": "a3r546465676bgyhyyehy",
-              "PhoneNumber":"0223456789"
-         }
-          """,
+        self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john1', 'href': self.server_url + '/HR/User/7'})
+        self.expect_json({'UserName': "john12345._-'",
+                          'href': self.server_url + '/HR/User/7'})
                   
-        self.PUT('/HR/User/7',{"PhoneNumber": ''}, headers={'X-Filter': 'User.UserName,User.PhoneNumber'})
+        self.PUT('/HR/User/7',{"PhoneNumber": ''},
+                 headers={'X-Filter': 'User.UserName,User.PhoneNumber'})
         self.inspect_status()
         self.inspect_json()
  
           
     def test_edit_user_deleted(self):  
-        self.POST('/HR/User',
-          """
-          {
-              "FirstName": "John",
-              "LastName": "Doe",
-              "UserName": "john1",
-              "EMail": "john1.doe@email.com",
-              "Password": "a3r546465676bgyhyyehy",
-              "PhoneNumber":"0223456789"
-         }
-          """,
+        self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john1', 'href': self.server_url + '/HR/User/7'})
+        self.expect_json({'UserName': "john12345._-'",
+                          'href': self.server_url + '/HR/User/7'})
              
         self.DELETE('/HR/User/7')
         self.expect_status(204)    
                   
-        self.PUT('/HR/User/7',{"FirstName": 'FirstName'}, headers={'X-Filter': 'User.UserName,User.FirstName'})
+        self.PUT('/HR/User/7',{"FirstName": 'FirstName'},
+                 headers={'X-Filter': 'User.UserName,User.FirstName'})
         self.expect_status(404)
         self.expect_json({'Id': {'other': {'msg': 'Unknown value'}}})
            

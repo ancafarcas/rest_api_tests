@@ -3,6 +3,7 @@ from unittest import main as start_tests
 from urllib.parse import quote
 
 from api_test_tool import ApiTestCase, ApiTestRunner
+from tests import fixtures
 
 
 class ExampleTestCase(ApiTestCase):
@@ -33,6 +34,11 @@ class ExampleTestCase(ApiTestCase):
                   """,
                   headers={'X-Filter': 'User.UserName'})
         self.inspect_status()
+        self.inspect_json()
+
+    def test_fixtures(self):
+        fixtures.init('/HR/User')
+        self.GET('/HR/User')
         self.inspect_json()
 
 # those lines shouldn't be in actual testcase:

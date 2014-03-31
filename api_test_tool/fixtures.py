@@ -16,15 +16,21 @@ class Fixtures():
     session = None
     token = None
     
-    def __init__(self, file_path):
+    def __init__(self, file_path, session=None, token=None):
         try:
             with open(file_path, 'r') as f:
                 self.fixtures = json.loads(f.read())
         except Exception:
             raise FixturesException("Fixture file can't be loaded")
         self.generated = {path: [] for path in self.fixtures}
-        self.session = Session()
-        self.token = log_in(session = self.session)
+        if session:
+            self.session = session
+        else:
+            self.session = Session()
+        if token:
+            self.token = token
+        else:
+            self.token = log_in(session = self.session)
 
     def _upload_record(self, path, record):
         resp = self.session.post(self.server_url + path, verify=False,
@@ -35,6 +41,12 @@ class Fixtures():
         if resp.status_code != 201:
             raise FixturesException("Can't upload record.",
                                     resp.status_code, resp.text)
+
+    def get(self, path):
+        return self.fixtures[path]["preloaded_data"] + self.generated[path]
+
+    def last_id(self, path):
+        return len(self.get(path))
 
     def reset_app(self):
         resp = self.session.put(self.server_url, verify=False,
