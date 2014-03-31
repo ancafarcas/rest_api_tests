@@ -10,7 +10,7 @@ class UserListTestCase(ApiTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.last_id = fixtures.last_id('/HR/User')
+        cls.last_id = fixtures.number('/HR/User')
         cls.record = """
         {
             "FirstName": "John",

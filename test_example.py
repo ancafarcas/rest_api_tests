@@ -3,10 +3,13 @@ from unittest import main as start_tests
 from urllib.parse import quote
 
 from api_test_tool import ApiTestCase, ApiTestRunner
-from tests import fixtures
+from tests import fixtures, session, token
 
 
 class ExampleTestCase(ApiTestCase):
+
+    session = session
+    token = token
 
     def test_filter_by_fullname(self):
         self.GET('/HR/User/?fullName={fullname}'
@@ -39,6 +42,8 @@ class ExampleTestCase(ApiTestCase):
     def test_fixtures(self):
         fixtures.init('/HR/User')
         self.GET('/HR/User')
+        self.inspect_json()
+        self.GET('/HR/User/1')
         self.inspect_json()
 
 # those lines shouldn't be in actual testcase:

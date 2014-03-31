@@ -1,6 +1,14 @@
 {
 		"/HR/User": {
-				"preloaded_data": [],
+				"preloaded_data": [
+					{
+						"FirstName": "User",
+						"LastName": "Admin",
+						"UserName": "admin",
+						"EMail": "User.Admin@email.addr",
+						"Password": "admin"
+					}
+				],
 				"fixtures": [],
 				"default_number": 5,
 				"template": {

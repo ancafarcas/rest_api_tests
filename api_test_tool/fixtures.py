@@ -48,6 +48,10 @@ class Fixtures():
     def last_id(self, path):
         return len(self.get(path))
 
+    def number(self, path):
+        return len(self.fixtures[path]["preloaded_data"]) \
++ self.fixtures[path]["default_number"]
+
     def reset_app(self):
         resp = self.session.put(self.server_url, verify=False,
                                 headers={'Authorization': self.token})
