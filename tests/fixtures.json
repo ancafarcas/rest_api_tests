@@ -2,14 +2,14 @@
 		"/HR/User": {
 				"preloaded_data": [],
 				"fixtures": [],
-				"default_number": [5],
+				"default_number": 5,
 				"template": {
 						"FirstName": "surname{n}",
 						"LastName": "name{n}",
 						"UserName": "test{n}",
 						"EMail": "test{n}@example.com",
 						"Password": "test{n}",
-						"PhoneNumber":"1234567890"
+						"PhoneNumber":"+1234567890"
 				}
 		}
 } 
