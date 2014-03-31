@@ -326,7 +326,7 @@ class UserListTestCase(ApiTestCase):
         self.expect_json({'UserName': 'john2',
                           'href': self.server_url + '/HR/User/8'})
            
-        self.PUT('/HR/User/8', {"EMail": "john2.doe@email.com"}, headers={'X-Filter': 'User.UserName,User.EMail'})
+        self.PUT('/HR/User/8', {"EMail": "john1.doe@email.com"}, headers={'X-Filter': 'User.UserName,User.EMail'})
         self.expect_status(400)
         self.expect_json({'EMail': {'unique': {'msg': 'Unique constraint failed'}}})
           
@@ -409,7 +409,7 @@ class UserListTestCase(ApiTestCase):
                  
         self.PUT('/HR/User/7',{"EMail": ""}, headers={'X-Filter': 'User.UserName,User.EMail'})
         self.expect_status(400)
-        self.expect_json({'EMail': {'format': {'msg': 'Invalid EMail'}}})
+        self.inpect_json({'EMail': {'format': {'msg': 'Invalid EMail'}}})
           
     def test_edit_user_missing_phone(self):  
         self.POST('/HR/User',
