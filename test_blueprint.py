@@ -3,10 +3,10 @@ from unittest import TestCase
 from unittest import main as start_tests
 from xmlrunner import XMLTestRunner
 
-from blueprint_testgen import meta_BlueprintTest
-from api_testclass import ApiTestCase, ApiTestRunner
-from auth import log_in
-from settings import XML_OUTPUT, VERBOSITY
+from api_test_tool.blueprint_testgen import meta_BlueprintTest
+from api_test_tool.api_testclass import ApiTestCase, ApiTestRunner
+from api_test_tool.auth import log_in
+from api_test_tool.settings import XML_OUTPUT, VERBOSITY
 
 
 if XML_OUTPUT:
@@ -15,7 +15,7 @@ else:
     test_runner = ApiTestRunner
 
 
-class BlueprintTestCase(TestCase, ApiTestCase, metaclass=meta_BlueprintTest):
+class BlueprintTestCase(ApiTestCase, metaclass=meta_BlueprintTest):
 
     maxDiff = None
 

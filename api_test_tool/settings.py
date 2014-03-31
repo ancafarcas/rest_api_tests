@@ -11,9 +11,7 @@ PRINT_URL = True
 PRINT_PAYLOAD = False
 XML_OUTPUT = False
 
-INIT_DB_CMD = "python database_tool/database_tool.py"
-
 try:
-    from settings_local import *
+    from api_test_tool.settings_local import *
 except:
     pass

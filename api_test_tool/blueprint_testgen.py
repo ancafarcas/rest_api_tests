@@ -1,6 +1,6 @@
 import json
 
-from settings import (
+from api_test_tool.settings import (
     SERVER_URL, BLUEPRINT_URL, BLUEPRINT_PATH, IGNORE_ENDPOINTS)
 
 

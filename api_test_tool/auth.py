@@ -3,7 +3,7 @@ import hashlib
 import hmac
 import json
 
-from settings import SERVER_URL, LOGIN, PASS
+from api_test_tool.settings import SERVER_URL, LOGIN, PASS
 
 
 server_url = SERVER_URL.rstrip('/')

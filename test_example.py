@@ -2,10 +2,10 @@ from unittest import TestCase
 from unittest import main as start_tests
 from urllib.parse import quote
 
-from api_testclass import ApiTestCase, ApiTestRunner
+from api_test_tool import ApiTestCase, ApiTestRunner
 
 
-class ExampleTestCase(TestCase, ApiTestCase):
+class ExampleTestCase(ApiTestCase):
 
     def test_filter_by_fullname(self):
         self.GET('/HR/User/?fullName={fullname}'

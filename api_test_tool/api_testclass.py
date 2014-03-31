@@ -4,8 +4,8 @@ from termcolor import colored
 from pprint import pprint
 from unittest import TestCase, TextTestResult, TextTestRunner
 
-from auth import log_in
-from settings import (
+from api_test_tool.auth import log_in
+from api_test_tool.settings import (
     SERVER_URL, PRINT_URL, XML_OUTPUT, VERBOSITY, PRINT_PAYLOAD)
 
 
@@ -48,7 +48,7 @@ class ApiTestRunner(TextTestRunner):
     resultclass = ApiTestResult
 
 
-class Helpers():
+class ApiTestCase(TestCase):
 
     def apply_path(self, json_dict, path):
         if path:
@@ -75,10 +75,6 @@ class Helpers():
         except ValueError:
             self.fail('Response in not a valid JSON.')
         return response_dict
-
-
-#class ApiTestCase(TestCase, Helpers):  # should be object; this line for cmplt
-class ApiTestCase(Helpers):
 
     maxDiff = None
 

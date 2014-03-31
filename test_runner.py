@@ -1,8 +1,8 @@
 from unittest import TestLoader
 from xmlrunner import XMLTestRunner
 
-from api_testclass import ApiTestRunner
-from settings import XML_OUTPUT, VERBOSITY
+from api_test_tool import ApiTestRunner
+from api_test_tool.settings import XML_OUTPUT, VERBOSITY
 
 
 if XML_OUTPUT:

@@ -1,11 +1,9 @@
-from unittest import TestCase
-
-from auth import hash_token
-from api_testclass import ApiTestCase
-from settings import LOGIN, PASS
+from api_test_tool import ApiTestCase
+from api_test_tool.auth import hash_token
+from api_test_tool.settings import LOGIN, PASS
 
 
-class LoginTestCase(TestCase, ApiTestCase):
+class LoginTestCase(ApiTestCase):
 
     def test_login_incorrect_username(self):
         self.POST('/Security/Authentication', with_auth=False)
