@@ -48,7 +48,7 @@ class UserListTestCase(ApiTestCase):
         self.expect_status(201)
         self.expect_json({
             'UserName': "john12345._-'",
-            'href': self.server_url + '/HR/User/7'
+            'href': self.record_href
         })
          
         #add deleted one
@@ -59,7 +59,7 @@ class UserListTestCase(ApiTestCase):
         self.expect_status(201)
         self.expect_json({
             'UserName': "john12345._-'",
-            'href': self.server_url + '/HR/User/7'
+            'href': self.record_href
         })
          
     def test_add_user_duplicate_username(self):
@@ -70,7 +70,7 @@ class UserListTestCase(ApiTestCase):
         self.expect_status(201)
         self.expect_json({
             'UserName': "john12345._-'",
-            'href': self.server_url + '/HR/User/7'
+            'href': self.record_href
         })
          
         #add duplicate username
@@ -100,7 +100,7 @@ class UserListTestCase(ApiTestCase):
         self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})        
+        self.expect_json({'UserName': "john12345._-'", 'href': self.record_href})        
          
          
         #add duplicate email
@@ -243,7 +243,7 @@ class UserListTestCase(ApiTestCase):
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
         self.expect_json({'UserName': "john12345._-'",
-                          'href': self.server_url + '/HR/User/7'})
+                          'href': self.record_href})
  
         self.PUT('/HR/User/7',
           """
@@ -265,14 +265,14 @@ il,User.Password,User.PhoneNumber'})
                           'LastName': 'DoeChanged',
                           'PhoneNumber': '+123123456789',
                           'UserName': "john12345._-'changed",
-                          'href': self.server_url + '/HR/User/7'})
+                          'href': self.record_href})
   
     def test_edit_user_duplicate_email(self):      
         self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
         self.expect_json({'UserName': "john12345._-'",
-                          'href': self.server_url + '/HR/User/7'})
+                          'href': self.record_href})
            
         self.POST('/HR/User',
           """
@@ -303,7 +303,7 @@ il,User.Password,User.PhoneNumber'})
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
         self.expect_json({'UserName': "john12345._-'",
-                          'href': self.server_url + '/HR/User/7'})
+                          'href': self.record_href})
               
         self.PUT('/HR/User/7',{"EMail": ";john1.doe@email.com"})
         self.expect_status(400)
@@ -314,7 +314,7 @@ il,User.Password,User.PhoneNumber'})
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
         self.expect_json({'UserName': "john12345._-'",
-                          'href': self.server_url + '/HR/User/7'})
+                          'href': self.record_href})
                
         self.PUT('/HR/User/7',{"FirstName": ""},
                  headers={'X-Filter': 'User.UserName,User.FirstName'})
@@ -327,7 +327,7 @@ il,User.Password,User.PhoneNumber'})
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
         self.expect_json({'UserName': "john12345._-'",
-                          'href': self.server_url + '/HR/User/7'})
+                          'href': self.record_href})
                 
         self.PUT('/HR/User/7',{"LastName": ""},
                  headers={'X-Filter': 'User.UserName,User.LastName'})
@@ -339,7 +339,7 @@ il,User.Password,User.PhoneNumber'})
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
         self.expect_json({'UserName': "john12345._-'",
-                          'href': self.server_url + '/HR/User/7'})
+                          'href': self.record_href})
                  
         self.PUT('/HR/User/7',{"EMail": ""},
                  headers={'X-Filter': 'User.UserName,User.EMail'})
@@ -351,7 +351,7 @@ il,User.Password,User.PhoneNumber'})
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
         self.expect_json({'UserName': "john12345._-'",
-                          'href': self.server_url + '/HR/User/7'})
+                          'href': self.record_href})
                   
         self.PUT('/HR/User/7',{"PhoneNumber": ''},
                  headers={'X-Filter': 'User.UserName,User.PhoneNumber'})
@@ -364,7 +364,7 @@ il,User.Password,User.PhoneNumber'})
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
         self.expect_json({'UserName': "john12345._-'",
-                          'href': self.server_url + '/HR/User/7'})
+                          'href': self.record_href})
              
         self.DELETE('/HR/User/7')
         self.expect_status(204)    
