@@ -4,7 +4,6 @@ Created on Mar 22, 2014
 @author: ioan
 '''
 from api_test_tool import ApiTestCase
-from api_test_tool.settings import SERVER_URL
 
 from tests import fixtures
 
@@ -29,7 +28,7 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': "john12345._-'", 'href': SERVER_URL + '/HR/User/7'})
+        self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})
          
          
         #add deleted one
@@ -49,7 +48,7 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': "john12345._-'", 'href': SERVER_URL + '/HR/User/7'})
+        self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})
          
          
     def test_add_user_already_deleted(self):
@@ -68,7 +67,7 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': "john12345._-'", 'href': SERVER_URL + '/HR/User/7'})
+        self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})
          
          
         #add deleted one
@@ -87,7 +86,7 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': "john12345._-'", 'href': SERVER_URL + '/HR/User/7'})
+        self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})
          
          
          
@@ -107,7 +106,7 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': "john12345._-'", 'href': SERVER_URL + '/HR/User/7'})
+        self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})
          
         #add duplicate username
         self.POST('/HR/User',
@@ -142,7 +141,7 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': "john12345._-'", 'href': SERVER_URL + '/HR/User/7'})        
+        self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})        
          
          
         #add duplicate email
@@ -293,7 +292,7 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': "john12345._-'", 'href': SERVER_URL + '/HR/User/7'})
+        self.expect_json({'UserName': "john12345._-'", 'href': self.server_url + '/HR/User/7'})
  
         self.PUT('/HR/User/7',
           """
@@ -313,7 +312,7 @@ class UserListTestCase(ApiTestCase):
                              'LastName': 'DoeChanged',
                              'PhoneNumber': '+123123456789',
                              'UserName': "john12345._-'changed",
-                             'href': SERVER_URL + '/HR/User/7'})
+                             'href': self.server_url + '/HR/User/7'})
   
     def test_edit_user_duplicate_email(self):      
         self.POST('/HR/User',
@@ -329,7 +328,7 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john1', 'href': SERVER_URL + '/HR/User/7'})
+        self.expect_json({'UserName': 'john1', 'href': self.server_url + '/HR/User/7'})
            
         self.POST('/HR/User',
           """
@@ -344,7 +343,7 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john2', 'href': SERVER_URL + '/HR/User/11'})
+        self.expect_json({'UserName': 'john2', 'href': self.server_url + '/HR/User/11'})
            
         self.PUT('/HR/User/7', {"EMail": "john2.doe@email.com"}, headers={'X-Filter': 'User.UserName,User.EMail'})
         self.expect_status(400)
@@ -364,7 +363,7 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john1', 'href': SERVER_URL + '/HR/User/7'})
+        self.expect_json({'UserName': 'john1', 'href': self.server_url + '/HR/User/7'})
               
         self.PUT('/HR/User/7',{"EMail": ";john1.doe@email.com"})
         self.expect_status(400)
@@ -384,7 +383,7 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john1', 'href': SERVER_URL + '/HR/User/7'})
+        self.expect_json({'UserName': 'john1', 'href': self.server_url + '/HR/User/7'})
                
         self.PUT('/HR/User/7',{"FirstName": ""}, headers={'X-Filter': 'User.UserName,User.FirstName'})
         self.inspect_status()
@@ -405,7 +404,7 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john1', 'href': SERVER_URL + '/HR/User/7'})
+        self.expect_json({'UserName': 'john1', 'href': self.server_url + '/HR/User/7'})
                 
         self.PUT('/HR/User/7',{"LastName": ""}, headers={'X-Filter': 'User.UserName,User.LastName'})
         self.inspect_status()
@@ -425,7 +424,7 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john1', 'href': SERVER_URL + '/HR/User/7'})
+        self.expect_json({'UserName': 'john1', 'href': self.server_url + '/HR/User/7'})
                  
         self.PUT('/HR/User/7',{"EMail": ""}, headers={'X-Filter': 'User.UserName,User.EMail'})
         self.expect_status(400)
@@ -445,7 +444,7 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john1', 'href': SERVER_URL + '/HR/User/7'})
+        self.expect_json({'UserName': 'john1', 'href': self.server_url + '/HR/User/7'})
                   
         self.PUT('/HR/User/7',{"PhoneNumber": ''}, headers={'X-Filter': 'User.UserName,User.PhoneNumber'})
         self.inspect_status()
@@ -466,7 +465,7 @@ class UserListTestCase(ApiTestCase):
           """,
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({'UserName': 'john1', 'href': SERVER_URL + '/HR/User/7'})
+        self.expect_json({'UserName': 'john1', 'href': self.server_url + '/HR/User/7'})
              
         self.DELETE('/HR/User/7')
         self.expect_status(204)    
