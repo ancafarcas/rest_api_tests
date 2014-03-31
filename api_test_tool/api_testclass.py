@@ -50,7 +50,16 @@ class ApiTestRunner(TextTestRunner):
 
 class ApiTestCase(TestCase):
 
-    def apply_path(self, json_dict, path):
+
+    maxDiff = None
+
+    session = None
+    token = None
+    response = None
+    server_url = SERVER_URL.rstrip('/')
+
+
+    def _apply_path(self, json_dict, path):
         if path:
             path_elements = path.split('/')
             for element in path_elements:
@@ -60,7 +69,7 @@ class ApiTestCase(TestCase):
                     self.fail("Path can't be applied")
         return json_dict
 
-    def parse_json_input(self, json_dict):
+    def _parse_json_input(self, json_dict):
         if isinstance(json_dict, str) \
            and ('{' in json_dict or '[' in json_dict):
             try:
@@ -69,19 +78,13 @@ class ApiTestCase(TestCase):
                 self.fail('You have provided not a valid JSON.')
         return json_dict
 
-    def parse_json_response(self):
+    def _parse_json_response(self):
         try:
             response_dict = json.loads(self.response.text)
         except ValueError:
             self.fail('Response in not a valid JSON.')
         return response_dict
 
-    maxDiff = None
-
-    session = None
-    token = None
-    response = None
-    server_url = SERVER_URL.rstrip('/')
 
     def request(self, method, uri, *args,
                 add_server=True, with_auth=True, **kwargs):
@@ -155,8 +158,8 @@ class ApiTestCase(TestCase):
         checks if json response equals some json,
         path separated by slashes, ie 'foo/bar/spam'
         """
-        json_input = self.parse_json_input(json_input)
-        json_response = self.apply_path(self.parse_json_response(), path)
+        json_input = self._parse_json_input(json_input)
+        json_response = self._apply_path(self._parse_json_response(), path)
 
         if partly:
             if isinstance(json_input, dict):
@@ -189,7 +192,7 @@ class ApiTestCase(TestCase):
         checks if count of objects in json response equals provided length,
         path separated by slashes, ie 'foo/bar/spam'
         """
-        json_response = self.apply_path(self.parse_json_response(), path)
+        json_response = self._apply_path(self._parse_json_response(), path)
         self.assertEqual(length, len(json_response),
                          "JSON objects count not matches.")
 
@@ -199,7 +202,7 @@ class ApiTestCase(TestCase):
 
     @property
     def json_response(self):
-        json_dict = self.parse_json_response()
+        json_dict = self._parse_json_response()
         return json_dict
 
     def inspect_json(self):
