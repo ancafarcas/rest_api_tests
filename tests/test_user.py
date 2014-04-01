@@ -9,9 +9,10 @@ class UserTestCase(ApiTestCase):
     session = session
     token = token
     
-    def href(self, obj_id):
+    @classmethod
+    def href(cls, obj_id):
         return '{server}/HR/User/{id}'.format(
-            server=self.server_url, id=obj_id)
+            server=cls.server_url, id=obj_id)
 
     @classmethod
     def setUpClass(cls):
@@ -266,10 +267,10 @@ User.EMail,User.Password,User.PhoneNumber'})
           headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
         self.expect_json({'UserName': 'john2',
-                          'href': self.server_url + '/HR/User/8'})
+                          'href': self.href(self.last_id+2)})
            
         self.PUT(
-            '/HR/User/8',
+            self.href(self.last_id+2),
             {"EMail": "john1.doe2@email.com"},
             headers={'X-Filter': 'User.UserName,User.EMail'})
         self.expect_status(400)
