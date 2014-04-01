@@ -10,7 +10,8 @@ if XML_OUTPUT:
 else:
     test_runner = ApiTestRunner
 
-
+PATTERN='test*.py'
+#PATTERN='*user_success*'
 if __name__ == '__main__':
-    tests = TestLoader().discover(start_dir='./tests')
+    tests = TestLoader().discover(start_dir='./tests', pattern=PATTERN)
     test_runner(verbosity=VERBOSITY).run(tests)

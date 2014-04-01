@@ -10,7 +10,7 @@
 					}
 				],
 				"fixtures": [],
-				"default_number": 5,
+				"default_number": 0,
 				"template": {
 						"FirstName": "surname{n}",
 						"LastName": "name{n}",

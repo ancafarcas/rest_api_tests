@@ -9,7 +9,7 @@ from api_test_tool.settings import SERVER_URL, LOGIN, PASS
 server_url = SERVER_URL.rstrip('/')
 
 
-class ApiException(Exception):
+class ApiAuthException(Exception):
     pass
 
 
@@ -40,11 +40,11 @@ def log_in(username=LOGIN, password=PASS, session=None):
     try:
         step1_answer = json.loads(step1.text)
     except ValueError as e:
-        raise ApiException(step1_url, step1.text, e)
+        raise ApiAuthException(step1_url, step1.text, e)
     try:
         token = step1_answer['Token']
     except KeyError as e:
-        raise ApiException(step1_url, step1.text, e)
+        raise ApiAuthException(step1_url, step1.text, e)
 
     hashed_token = hash_token(username, password, token)
 
@@ -62,5 +62,5 @@ def log_in(username=LOGIN, password=PASS, session=None):
         step2_answer = json.loads(step2.text)
         session_key = step2_answer['Session']
     except (ValueError, KeyError) as e:
-        raise ApiException(step2_url, step2.text, e)
+        raise ApiAuthException(step2_url, step2.text, e)
     return session_key
