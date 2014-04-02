@@ -10,9 +10,12 @@ class UserTestCase(ApiTestCase):
     token = token
     
     @classmethod
+    def uri(cls, obj_id):
+        return '/HR/User/{id}'.format(id=obj_id)
+
+    @classmethod
     def href(cls, obj_id):
-        return '{server}/HR/User/{id}'.format(
-            server=cls.server_url, id=obj_id)
+        return cls.server_url + cls.uri(obj_id)
 
     @classmethod
     def setUpClass(cls):
@@ -29,6 +32,7 @@ class UserTestCase(ApiTestCase):
             "PhoneNumber": "0223456789"
         }
         cls.record_href = cls.href(cls.last_id+1)
+        cls.record_uri = cls.uri(cls.last_id+1)
 
 
     def setUp(self):
@@ -53,7 +57,7 @@ class UserTestCase(ApiTestCase):
          
     def test_add_user_already_deleted(self):
         #add deleted one
-        self.DELETE(self.record_href)
+        self.DELETE(self.record_uri)
         self.expect_status(204)
         self.POST('/HR/User', self.record,
           headers={'X-Filter': 'User.UserName'})
@@ -160,8 +164,11 @@ digits and characters ".", "_", "\'", "-"',
          }
           """,
           headers={'X-Filter': 'User.UserName'})
-        self.inspect_status()
-        self.inspect_json()
+        self.expect_status(400)
+        self.expect_json(
+            {'FirstName': {'mandatory':
+                {'msg': 'Mandatory value is missing'}
+            }})
   
     def test_add_user_missing_last_name(self):        
         #add missing last name
@@ -176,8 +183,11 @@ digits and characters ".", "_", "\'", "-"',
          }
           """,
           headers={'X-Filter': 'User.UserName'})
-        self.inspect_status()
-        self.inspect_json()
+        self.expect_status(400)
+        self.expect_json(
+            {'LastName': {'mandatory':
+                {'msg': 'Mandatory value is missing'}
+            }})
          
     def test_add_user_missing_email(self):        
         #add missing email
@@ -192,8 +202,11 @@ digits and characters ".", "_", "\'", "-"',
          }
           """,
           headers={'X-Filter': 'User.UserName'})
-        self.inspect_status()
-        self.inspect_json()
+        self.expect_status(400)
+        self.expect_json(
+            {'EMail': {'mandatory':
+                {'msg': 'Mandatory value is missing'}
+            }})
          
     def test_add_user_missing_phone(self):         
         #add missing phone
@@ -208,8 +221,11 @@ digits and characters ".", "_", "\'", "-"',
          }
           """,
           headers={'X-Filter': 'User.UserName'})
-        self.inspect_status()
-        self.inspect_json()       
+        self.expect_status(400)
+        self.expect_json(
+            {'Phone': {'mandatory':
+                {'msg': 'Mandatory value is missing'}
+            }})
          
     def test_add_user_missing_password(self):         
         #missing password
@@ -224,14 +240,17 @@ digits and characters ".", "_", "\'", "-"',
          }
           """,
           headers={'X-Filter': 'User.UserName'})
-        self.inspect_status()
-        self.inspect_json()   
+        self.expect_status(400)
+        self.expect_json(
+            {'Password': {'mandatory':
+                {'msg': 'Mandatory value is missing'}
+            }})
           
           
     def test_edit_user_success(self):
         #edit with success, check new values, check login
         self.PUT(
-            self.record_href,
+            self.record_uri,
             """
             {
               "FirstName": "JohnChanged",
@@ -270,7 +289,7 @@ User.EMail,User.Password,User.PhoneNumber'})
                           'href': self.href(self.last_id+2)})
            
         self.PUT(
-            self.href(self.last_id+2),
+            self.uri(self.last_id+2),
             {"EMail": "john1.doe2@email.com"},
             headers={'X-Filter': 'User.UserName,User.EMail'})
         self.expect_status(400)
@@ -280,69 +299,77 @@ User.EMail,User.Password,User.PhoneNumber'})
         }})
           
     def test_edit_user_incorect_email(self):  
-        self.PUT(self.record_href,{"EMail": ";john1.doe@email.com"})
+        self.PUT(self.record_uri,{"EMail": ";john1.doe@email.com"})
         self.expect_status(400)
         self.expect_json({'EMail': {'format': {'msg': 'Invalid EMail'}}})        
      
     def test_edit_user_missing_first_name(self):  
-        self.PUT(self.record_href,{"FirstName": ""},
+        self.PUT(self.record_uri,{"FirstName": ""},
                  headers={'X-Filter': 'User.UserName,User.FirstName'})
-        self.inspect_status()
-        self.inspect_json()       
+        self.expect_status(400)
+        self.expect_json(
+            {'FirstName': {'mandatory':
+                {'msg': 'Mandatory value is missing'}
+            }})
  
           
     def test_edit_user_missing_last_name(self):  
-        self.PUT(self.record_href,{"LastName": ""},
+        self.PUT(self.record_uri,{"LastName": ""},
                  headers={'X-Filter': 'User.UserName,User.LastName'})
-        self.inspect_status()
-        self.inspect_json()  
+        self.expect_status(400)
+        self.expect_json(
+            {'LastName': {'mandatory':
+                {'msg': 'Mandatory value is missing'}
+            }})
          
     def test_edit_user_missing_email(self):  
-        self.PUT(self.record_href,{"EMail": ""},
+        self.PUT(self.record_uri,{"EMail": ""},
                  headers={'X-Filter': 'User.UserName,User.EMail'})
         self.expect_status(400)
-        self.inpect_json({'EMail': {'format': {'msg': 'Invalid EMail'}}})
+        self.expect_json(
+            {'EMail': {'mandatory':
+                {'msg': 'Mandatory value is missing'}
+            }})
           
     def test_edit_user_missing_phone(self):  
-        self.PUT(self.record_href,{"PhoneNumber": ''},
+        self.PUT(self.record_uri,{"PhoneNumber": ''},
                  headers={'X-Filter': 'User.UserName,User.PhoneNumber'})
-        self.inspect_status()
-        self.inspect_json()
- 
+        self.expect_status(400)
+        self.expect_json(
+            {'Phone': {'mandatory':
+                {'msg': 'Mandatory value is missing'}
+            }})
           
     def test_edit_user_deleted(self):  
-        self.DELETE(self.record_href)
+        self.DELETE(self.record_uri)
         self.expect_status(204)    
                   
-        self.PUT(self.record_href,{"FirstName": 'FirstName'},
+        self.PUT(self.record_uri,{"FirstName": 'FirstName'},
                  headers={'X-Filter': 'User.UserName,User.FirstName'})
         self.expect_status(404)
         self.expect_json({'Id': {'other': {'msg': 'Unknown value'}}})
            
     def test_delete_user(self):
         #check user is here
-        self.GET(self.href(self.last_id))
+        self.GET(self.uri(self.last_id))
         self.expect_status(200)
         self.inspect_headers()
         self.inspect_body()
            
         #delete success
-        self.DELETE(self.href(self.last_id))
-        self.expect_status(200)
+        self.DELETE(self.uri(self.last_id))
         self.expect_status(204)
         self.inspect_headers()
         self.inspect_body()
    
         #delete again same response?
-        self.DELETE(self.href(self.last_id))
-        self.expect_status(200)
+        self.DELETE(self.uri(self.last_id))
         self.expect_status(204)
         self.inspect_headers()
         self.inspect_body()
            
         #check user not exists
-        self.GET(self.href(self.last_id))
-        self.expect_status(200)
+        self.GET(self.uri(self.last_id))
         self.expect_status(404)     
 
 

@@ -7,7 +7,7 @@ LOGIN = 'admin'
 PASS = 'admin'
 
 VERBOSITY = 2
-PRINT_URL = True
+PRINT_URL = False
 PRINT_PAYLOAD = False
 XML_OUTPUT = False
 
