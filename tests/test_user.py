@@ -270,7 +270,12 @@ User.EMail,User.Password,User.PhoneNumber'})
                           'PhoneNumber': '+123123456789',
                           'UserName': "john12345._-'changed",
                           'href': self.record_href})
-  
+
+    def test_edit_user_username(self):
+        self.PUT(self.record_uri, {"UserName": "new_user_name"})
+        self.expect_status(400)
+        self.inspect_json()
+
     def test_edit_user_duplicate_email(self):      
         self.POST('/HR/User',
           """
@@ -299,12 +304,14 @@ User.EMail,User.Password,User.PhoneNumber'})
         }})
           
     def test_edit_user_incorect_email(self):  
-        self.PUT(self.record_uri,{"EMail": ";john1.doe@email.com"})
+        self.PUT(self.record_uri,
+                 {"EMail": ";john1.doe@email.com"})
         self.expect_status(400)
         self.expect_json({'EMail': {'format': {'msg': 'Invalid EMail'}}})        
      
     def test_edit_user_missing_first_name(self):  
-        self.PUT(self.record_uri,{"FirstName": ""},
+        self.PUT(self.record_uri,
+                 {"FirstName": ""},
                  headers={'X-Filter': 'User.UserName,User.FirstName'})
         self.expect_status(400)
         self.expect_json(
