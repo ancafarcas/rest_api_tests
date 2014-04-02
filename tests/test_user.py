@@ -208,15 +208,15 @@ digits and characters ".", "_", "\'", "-"'}
                 "FirstName": "John",
                 "LastName": "Doe",
                 "UserName": "johnphone",
-                "EMail": ";john.doe.phone@email.com",
+                "EMail": "john.doe.phone@email.com",
                 "Password": "a3r546465676bgyhyyehy",
             },
             headers={'X-Filter': 'User.UserName'})
-        self.expect_status(400)
-        self.expect_json(
-            {'Phone': {'mandatory':
-                {'msg': 'Mandatory value is missing'}
-            }})
+        self.expect_status(201)
+        self.expect_json({
+            'UserName': "johnphone",
+            'href': self.href(self.last_id+2)
+        })
 
     def test_add_user_missing_password(self):
         # missing password
@@ -226,8 +226,8 @@ digits and characters ".", "_", "\'", "-"'}
                 "FirstName": "John",
                 "LastName": "Doe",
                 "UserName": "johnpassword",
-                "EMail": ";john.doe.password@email.com",
-                "Password": "a3r546465676bgyhyyehy",
+                "EMail": "john.doe.password@email.com",
+                "PhoneNumber": "+123123456789"
             },
             headers={'X-Filter': 'User.UserName'})
         self.expect_status(400)
