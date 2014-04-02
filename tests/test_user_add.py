@@ -37,7 +37,7 @@ class UserAddTestCase(ApiTestCase):
     def setUp(self):
         fixtures.init('/HR/User')
 
-    def test_add_user_success(self):
+    def test_success(self):
         # add user
         self.POST(
             '/HR/User',
@@ -55,7 +55,7 @@ class UserAddTestCase(ApiTestCase):
         except ApiAuthException:
             self.fail("Newly created user can't log in.")
 
-    def test_add_user_already_deleted(self):
+    def test_already_deleted(self):
         # add user
         self.POST(
             '/HR/User',
@@ -80,7 +80,7 @@ class UserAddTestCase(ApiTestCase):
         except ApiAuthException:
             self.fail("Newly created user can't log in.")
 
-    def test_add_user_duplicate_username(self):
+    def test_duplicate_username(self):
         # add duplicate username
         self.POST(
             '/HR/User',
@@ -99,7 +99,7 @@ class UserAddTestCase(ApiTestCase):
                 {'msg': 'There is already an active user with this name'}
             }})
 
-    def test_add_user_duplicate_email(self):
+    def test_duplicate_email(self):
         # add duplicate email
         self.POST(
             '/HR/User',
@@ -118,7 +118,7 @@ class UserAddTestCase(ApiTestCase):
                 {'msg': 'Unique constraint failed'}
             }})
 
-    def test_add_user_incorrect_username(self):
+    def test_incorrect_username(self):
         # add incorrect username
         self.POST(
             '/HR/User',
@@ -139,7 +139,7 @@ class UserAddTestCase(ApiTestCase):
 digits and characters ".", "_", "\'", "-"'}
             }})
 
-    def test_add_user_incorrect_email(self):
+    def test_incorrect_email(self):
         # add incorrect email
         self.POST(
             '/HR/User',
@@ -158,7 +158,7 @@ digits and characters ".", "_", "\'", "-"'}
                 {'msg': 'Invalid EMail'}
             }})
 
-    def test_add_user_missing_first_name(self):
+    def test_missing_first_name(self):
         # add missing first name
         self.POST(
             '/HR/User',
@@ -176,7 +176,7 @@ digits and characters ".", "_", "\'", "-"'}
                 {'msg': 'Mandatory value is missing'}
             }})
 
-    def test_add_user_missing_last_name(self):
+    def test_missing_last_name(self):
         # add missing last name
         self.POST(
             '/HR/User',
@@ -194,7 +194,7 @@ digits and characters ".", "_", "\'", "-"'}
                 {'msg': 'Mandatory value is missing'}
             }})
 
-    def test_add_user_missing_email(self):
+    def test_missing_email(self):
         # add missing email
         self.POST(
             '/HR/User',
@@ -212,7 +212,7 @@ digits and characters ".", "_", "\'", "-"'}
                 {'msg': 'Mandatory value is missing'}
             }})
 
-    def test_add_user_missing_phone(self):
+    def test_missing_phone(self):
         # add missing phone
         self.POST(
             '/HR/User',
@@ -230,7 +230,7 @@ digits and characters ".", "_", "\'", "-"'}
             'href': self.href(self.last_id+2)
         })
 
-    def test_add_user_missing_password(self):
+    def test_missing_password(self):
         # missing password
         self.POST(
             '/HR/User',
@@ -247,4 +247,3 @@ digits and characters ".", "_", "\'", "-"'}
             {'Password': {'mandatory':
                 {'msg': 'Mandatory value is missing'}
             }})
-
