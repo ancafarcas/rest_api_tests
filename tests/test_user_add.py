@@ -76,7 +76,7 @@ class UserAddTestCase(ApiTestCase):
 
         try:
             log_in(username=self.record["UserName"],
-                   password=self.password),
+                   password=self.password)
         except ApiAuthException:
             self.fail("Newly created user can't log in.")
 

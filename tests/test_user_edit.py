@@ -45,7 +45,7 @@ class UserEditTestCase(ApiTestCase):
             'href': self.record_href
         })
 
-    def test_edit_user_success(self):
+    def test_success(self):
         # edit with success, check new values, check login
         self.PUT(
             self.record_uri,
@@ -72,13 +72,34 @@ User.EMail,User.Password,User.PhoneNumber'}
             'href': self.record_href
         })
 
-    def test_edit_user_username(self):
+    def test_username(self):
         # username shouldn't be editable
         self.PUT(self.record_uri, {"UserName": "new_user_name"})
         self.expect_status(400)
         self.inspect_json()
 
-    def test_edit_user_duplicate_email(self):
+    def test_password(self):
+        new_password = 'new_password'
+        new_password_hashed = hashlib.sha512(
+            bytes(new_password, 'utf-8')
+        ).hexdigest(),
+        self.PUT(
+            self.record_uri,
+            {'Password': new_password_hashed})
+        self.inspect_json()
+        self.expect_status(200)
+        # old password shouldn't work
+        with self.assertRaises(ApiAuthException):
+            log_in(username=self.record["UserName"],
+                   password=self.password)
+        # new password should work
+        try:
+            log_in(username=self.record["UserName"],
+                   password=new_password)
+        except ApiAuthException:
+            self.fail("User can't log in with the new password.")
+
+    def test_duplicate_email(self):
         self.POST(
             '/HR/User',
             {
@@ -105,7 +126,7 @@ User.EMail,User.Password,User.PhoneNumber'}
                 {'msg': 'Unique constraint failed'}
             }})
 
-    def test_edit_user_incorect_email(self):
+    def test_incorect_email(self):
         self.PUT(
             self.record_uri,
             {"EMail": ";john1.doe@email.com"})
@@ -115,7 +136,7 @@ User.EMail,User.Password,User.PhoneNumber'}
                 {'msg': 'Invalid EMail'}
             }})
 
-    def test_edit_user_missing_first_name(self):
+    def test_missing_first_name(self):
         self.PUT(
             self.record_uri,
             {"FirstName": ""},
@@ -126,7 +147,7 @@ User.EMail,User.Password,User.PhoneNumber'}
                 {'msg': 'Mandatory value is missing'}
             }})
 
-    def test_edit_user_missing_last_name(self):
+    def test_missing_last_name(self):
         self.PUT(
             self.record_uri,
             {"LastName": ""},
@@ -137,7 +158,7 @@ User.EMail,User.Password,User.PhoneNumber'}
                 {'msg': 'Mandatory value is missing'}
             }})
 
-    def test_edit_user_missing_email(self):
+    def test_missing_email(self):
         self.PUT(
             self.record_uri,
             {"EMail": ""},
@@ -148,7 +169,7 @@ User.EMail,User.Password,User.PhoneNumber'}
                 {'msg': 'Mandatory value is missing'}
             }})
 
-    def test_edit_user_missing_phone(self):
+    def test_missing_phone(self):
         self.PUT(
             self.record_uri,
             {"PhoneNumber": ''},
@@ -160,7 +181,7 @@ User.EMail,User.Password,User.PhoneNumber'}
             'href': self.record_href
         })
 
-    def test_edit_user_deleted(self):
+    def test_deleted(self):
         self.DELETE(self.record_uri)
         self.expect_status(204)
 
