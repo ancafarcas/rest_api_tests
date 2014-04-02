@@ -5,7 +5,7 @@ import hashlib
 from tests import fixtures, session, token
 
 
-class UserTestCase(ApiTestCase):
+class UserAddTestCase(ApiTestCase):
     session = session
     token = token
 
@@ -36,16 +36,18 @@ class UserTestCase(ApiTestCase):
 
     def setUp(self):
         fixtures.init('/HR/User')
+
+    def test_add_user_success(self):
         # add user
-        self.POST('/HR/User', self.record,
-                  headers={'X-Filter': 'User.UserName'})
+        self.POST(
+            '/HR/User',
+            self.record,
+            headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
         self.expect_json({
             'UserName': self.record["UserName"],
             'href': self.record_href
         })
-
-    def test_add_user_success(self):
         # log in with newly created user
         try:
             log_in(username=self.record["UserName"],
@@ -54,6 +56,16 @@ class UserTestCase(ApiTestCase):
             self.fail("Newly created user can't log in.")
 
     def test_add_user_already_deleted(self):
+        # add user
+        self.POST(
+            '/HR/User',
+            self.record,
+            headers={'X-Filter': 'User.UserName'})
+        self.expect_status(201)
+        self.expect_json({
+            'UserName': self.record["UserName"],
+            'href': self.record_href
+        })
         # add deleted one
         self.DELETE(self.record_uri)
         self.expect_status(204)
@@ -236,168 +248,3 @@ digits and characters ".", "_", "\'", "-"'}
                 {'msg': 'Mandatory value is missing'}
             }})
 
-    def test_edit_user_success(self):
-        # edit with success, check new values, check login
-        self.PUT(
-            self.record_uri,
-            """
-            {
-              "FirstName": "JohnChanged",
-              "LastName": "DoeChanged",
-              "UserName": "john12345._-'changed",
-              "EMail": "john1.doe2.changed@email.com",
-              "Password": "aaa3r546465676bgyhyyehy",
-              "PhoneNumber":"+123123456789"
-            }
-            """,
-            headers={'X-Filter': 'User.UserName,User.FirstName,User.LastName,\
-User.EMail,User.Password,User.PhoneNumber'}
-        )
-        self.expect_status(200)
-        self.expect_json({
-            'EMail': 'john1.doe2.changed@email.com',
-            'FirstName': 'JohnChanged',
-            'LastName': 'DoeChanged',
-            'PhoneNumber': '+123123456789',
-            'UserName': "john12345._-'changed",
-            'href': self.record_href
-        })
-
-    def test_edit_user_username(self):
-        # username shouldn't be editable
-        self.PUT(self.record_uri, {"UserName": "new_user_name"})
-        self.expect_status(400)
-        self.inspect_json()
-
-    def test_edit_user_duplicate_email(self):
-        self.POST(
-            '/HR/User',
-            {
-                "FirstName": "John",
-                "LastName": "Doe",
-                "UserName": "john2",
-                "EMail": "john2.doe@email.com",
-                "Password": "a3r546465676bgyhyyehy",
-                "PhoneNumber": "0223456789"
-            },
-            headers={'X-Filter': 'User.UserName'})
-        self.expect_status(201)
-        self.expect_json({
-            'UserName': 'john2',
-            'href': self.href(self.last_id+2)})
-
-        self.PUT(
-            self.uri(self.last_id+2),
-            {"EMail": "john1.doe2@email.com"},
-            headers={'X-Filter': 'User.UserName,User.EMail'})
-        self.expect_status(400)
-        self.expect_json(
-            {'EMail': {'unique':
-                {'msg': 'Unique constraint failed'}
-            }})
-
-    def test_edit_user_incorect_email(self):
-        self.PUT(
-            self.record_uri,
-            {"EMail": ";john1.doe@email.com"})
-        self.expect_status(400)
-        self.expect_json(
-            {'EMail': {'format':
-                {'msg': 'Invalid EMail'}
-            }})
-
-    def test_edit_user_missing_first_name(self):
-        self.PUT(
-            self.record_uri,
-            {"FirstName": ""},
-            headers={'X-Filter': 'User.UserName,User.FirstName'})
-        self.expect_status(400)
-        self.expect_json(
-            {'FirstName': {'mandatory':
-                {'msg': 'Mandatory value is missing'}
-            }})
-
-    def test_edit_user_missing_last_name(self):
-        self.PUT(
-            self.record_uri,
-            {"LastName": ""},
-            headers={'X-Filter': 'User.UserName,User.LastName'})
-        self.expect_status(400)
-        self.expect_json(
-            {'LastName': {'mandatory':
-                {'msg': 'Mandatory value is missing'}
-            }})
-
-    def test_edit_user_missing_email(self):
-        self.PUT(
-            self.record_uri,
-            {"EMail": ""},
-            headers={'X-Filter': 'User.UserName,User.EMail'})
-        self.expect_status(400)
-        self.expect_json(
-            {'EMail': {'mandatory':
-                {'msg': 'Mandatory value is missing'}
-            }})
-
-    def test_edit_user_missing_phone(self):
-        self.PUT(
-            self.record_uri,
-            {"PhoneNumber": ''},
-            headers={'X-Filter': 'User.UserName,User.PhoneNumber'})
-        self.expect_status(200)
-        self.expect_json({
-            'PhoneNumber': '',
-            'UserName': self.record["UserName"],
-            'href': self.record_href
-        })
-
-    def test_edit_user_deleted(self):
-        self.DELETE(self.record_uri)
-        self.expect_status(204)
-
-        self.PUT(
-            self.record_uri,
-            {"FirstName": 'FirstName'},
-            headers={'X-Filter': 'User.UserName,User.FirstName'})
-        self.expect_status(404)
-        self.expect_json(
-            {'Id': {'other':
-                {'msg': 'Unknown value'}
-            }})
-
-    def test_delete_user(self):
-        # check user is here
-        self.GET(self.uri(self.last_id))
-        self.expect_status(200)
-        self.inspect_headers()
-        self.inspect_body()
-
-        # delete success
-        self.DELETE(self.uri(self.last_id))
-        self.expect_status(204)
-        self.inspect_headers()
-        self.inspect_body()
-
-        # delete again same response?
-        self.DELETE(self.uri(self.last_id))
-        self.expect_status(204)
-        self.inspect_headers()
-        self.inspect_body()
-
-        # check user not exists
-        self.GET(self.uri(self.last_id))
-        self.expect_status(404)
-
-#     def test_list_user(self):
-#         #search
-#         #pagination
-#         self.GET('/HR/User')
-#         self.expect_status(200)
-#         self.inspect_headers()
-#         self.inspect_body()
-#
-#
-#     def test_all_users_details(self):
-#         self.GET('/HR/User', headers={'X-Filter': 'User.*'})
-#         self.inspect_headers()
-#         self.inspect_body()
