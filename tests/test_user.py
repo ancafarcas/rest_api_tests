@@ -60,10 +60,13 @@ class UserTestCase(ApiTestCase):
         self.POST('/HR/User', self.record,
                   headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json({
-            'UserName': self.record["UserName"],
-            'href': self.record_href
-        })
+        self.expect_json(self.record["UserName"], path="UserName")
+
+        try:
+            log_in(username=self.record["UserName"],
+                   password=self.password),
+        except ApiAuthException:
+            self.fail("Newly created user can't log in.")
 
     def test_add_user_duplicate_username(self):
         # add duplicate username
@@ -248,14 +251,17 @@ digits and characters ".", "_", "\'", "-"'}
             }
             """,
             headers={'X-Filter': 'User.UserName,User.FirstName,User.LastName,\
-User.EMail,User.Password,User.PhoneNumber'})
+User.EMail,User.Password,User.PhoneNumber'}
+        )
         self.expect_status(200)
-        self.expect_json({'EMail': 'john1.doe2.changed@email.com',
-                          'FirstName': 'JohnChanged',
-                          'LastName': 'DoeChanged',
-                          'PhoneNumber': '+123123456789',
-                          'UserName': "john12345._-'changed",
-                          'href': self.record_href})
+        self.expect_json({
+            'EMail': 'john1.doe2.changed@email.com',
+            'FirstName': 'JohnChanged',
+            'LastName': 'DoeChanged',
+            'PhoneNumber': '+123123456789',
+            'UserName': "john12345._-'changed",
+            'href': self.record_href
+        })
 
     def test_edit_user_username(self):
         # username shouldn't be editable
@@ -338,11 +344,12 @@ User.EMail,User.Password,User.PhoneNumber'})
             self.record_uri,
             {"PhoneNumber": ''},
             headers={'X-Filter': 'User.UserName,User.PhoneNumber'})
-        self.expect_status(400)
-        self.expect_json(
-            {'Phone': {'mandatory':
-                {'msg': 'Mandatory value is missing'}
-            }})
+        self.expect_status(200)
+        self.expect_json({
+            'PhoneNumber': '',
+            'UserName': self.record["UserName"],
+            'href': self.record_href
+        })
 
     def test_edit_user_deleted(self):
         self.DELETE(self.record_uri)
@@ -388,9 +395,9 @@ User.EMail,User.Password,User.PhoneNumber'})
 #         self.expect_status(200)
 #         self.inspect_headers()
 #         self.inspect_body()
-#         
-#         
+#
+#
 #     def test_all_users_details(self):
 #         self.GET('/HR/User', headers={'X-Filter': 'User.*'})
 #         self.inspect_headers()
-#         self.inspect_body()      
+#         self.inspect_body()
