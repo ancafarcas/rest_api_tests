@@ -14,7 +14,7 @@ class LoginTestCase(ApiTestCase):
                        'wrong_username', PASS, self.json_response['Token']
                    )},
                   with_auth=False)
-        self.expect_status(401)
+        self.expect_status(400)
         self.expect_json(
             {"other": {"invalid": {"msg": "Invalid credentials"}}})
 
@@ -27,7 +27,7 @@ class LoginTestCase(ApiTestCase):
                        LOGIN, 'wrong_password', self.json_response['Token']
                    )},
                   with_auth=False)
-        self.expect_status(401)
+        self.expect_status(400)
         self.expect_json(
             {"other": {"invalid": {"msg": "Invalid credentials"}}})
 
@@ -43,7 +43,7 @@ bcaf20507c15e0f78f183e25debe30ba81df1e09e379b493aec02dc194fde73e9fc71e',
 ae37bcaf20507c15e0f78f183e25debe30ba81df1e09e379b493aec02dc194fde73e9fc71e'
                    )},
                   with_auth=False)
-        self.expect_status(401)
+        self.expect_status(400)
         self.expect_json(
             {"other": {"invalid": {"msg": "Invalid credentials"}}})
 
@@ -57,6 +57,6 @@ ae37bcaf20507c15e0f78f183e25debe30ba81df1e09e379b493aec02dc194fde73e9fc71e'
 a16f96e4ae763a1bf1a858dad4701fecc35f73785cc397ac54487d30da3313a0d7e5f4',
                   },
                   with_auth=False)
-        self.expect_status(401)
+        self.expect_status(400)
         self.expect_json(
             {"other": {"invalid": {"msg": "Invalid credentials"}}})
