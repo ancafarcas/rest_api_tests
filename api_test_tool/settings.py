@@ -9,6 +9,7 @@ PASS = 'admin'
 VERBOSITY = 2
 PRINT_URL = False
 PRINT_PAYLOAD = False
+PRINT_DELIMITER = False
 XML_OUTPUT = False
 
 try:

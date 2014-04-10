@@ -6,7 +6,8 @@ from unittest import TestCase, TextTestResult, TextTestRunner
 
 from api_test_tool.auth import log_in
 from api_test_tool.settings import (
-    SERVER_URL, PRINT_URL, XML_OUTPUT, VERBOSITY, PRINT_PAYLOAD)
+    SERVER_URL, PRINT_URL, XML_OUTPUT, VERBOSITY, PRINT_PAYLOAD,
+    PRINT_DELIMITER)
 
 
 class ApiTestResult(TextTestResult):
@@ -14,7 +15,8 @@ class ApiTestResult(TextTestResult):
     def startTest(self, test):
         super(TextTestResult, self).startTest(test)
         if self.showAll:
-            self.stream.writeln(colored('_' * 70, 'grey'))
+            if PRINT_DELIMITER:
+                self.stream.writeln(colored('_' * 70, 'grey'))
             self.stream.writeln(
                 colored(self.getDescription(test), 'magenta')
             )
@@ -134,9 +136,28 @@ class ApiTestCase(TestCase):
     def DELETE(self, *args, **kwargs):
         self.request('DELETE', *args, **kwargs)
 
+    @property
+    def json_response(self):
+        json_dict = self._parse_json_response()
+        return json_dict
+
+    def inspect_json(self):
+        pprint(self.json_response)
+
+    def inspect_body(self):
+        pprint(self.response.text)
+
+    def inspect_status(self):
+        print(self.response.status_code)
+
+    def inspect_headers(self):
+        pprint(dict(self.response.headers))
+
     def expect_status(self, code):
-        self.assertEqual(code, self.response.status_code,
-                         "Status code not matches.")
+        self.assertEqual(
+            code, self.response.status_code,
+            "Status code not matches.\nResponse body:\n{body}:"
+            .format(body=self.response.text))
 
     def expect_header(self, header, value, partly=False):
         self.assertIn(header, self.response.headers,
@@ -199,20 +220,3 @@ class ApiTestCase(TestCase):
     def expect_body_contains(self, body):
         self.assertIn(body, self.response.text,
                       "Body not matches.")
-
-    @property
-    def json_response(self):
-        json_dict = self._parse_json_response()
-        return json_dict
-
-    def inspect_json(self):
-        pprint(self.json_response)
-
-    def inspect_body(self):
-        pprint(self.response.text)
-
-    def inspect_status(self):
-        print(self.response.status_code)
-
-    def inspect_headers(self):
-        pprint(dict(self.response.headers))
