@@ -30,14 +30,12 @@ class Fixtures():
         if token:
             self.token = token
         else:
-            self.token = log_in(session = self.session)
+            self.token = log_in(session=self.session)
 
     def _upload_record(self, path, record):
         resp = self.session.post(self.server_url + path, verify=False,
                                  headers={'Authorization': self.token},
                                  data=json.dumps(record))
-        #print(resp.text)
-        #print(resp.status_code)
         if resp.status_code != 201:
             raise FixturesException("Can't upload record.",
                                     resp.status_code, resp.text)
@@ -50,7 +48,7 @@ class Fixtures():
 
     def number(self, path):
         return len(self.fixtures[path]["preloaded_data"]) \
-+ self.fixtures[path]["default_number"]
+            + self.fixtures[path]["default_number"]
 
     def reset_app(self):
         resp = self.session.put(self.server_url, verify=False,
@@ -69,17 +67,19 @@ class Fixtures():
             self._upload_record(path, record)
             self.generated[path].append(record)
 
-    def upload(self, path):
+    def upload(self, path, number=None):
         fixture = self.fixtures[path]
+        if not number:
+            number = fixture["default_number"]
         if "fixtures" in fixture:
             for record in fixture["fixtures"]:
                 self._upload_record(path, record)
         if "default_number" in fixture:
-            self.generate(path, fixture["default_number"])
+            self.generate(path, number)
 
-    def init(self, path):
+    def init(self, path, number=None):
         self.reset_app()
-        self.upload(path)
+        self.upload(path, number=None)
 
     def init_all(self):
         for path in self.fixtures:
