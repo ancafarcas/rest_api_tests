@@ -81,6 +81,10 @@ class UserAddTestCase(ApiTestCase):
             self.fail("Newly created user can't log in.")
 
     def test_duplicate_username(self):
+        # add user
+        self.POST('/HR/User', self.record,
+                  headers={'X-Filter': 'User.UserName'})
+        self.expect_status(201)
         # add duplicate username
         self.POST(
             '/HR/User',
@@ -100,6 +104,9 @@ class UserAddTestCase(ApiTestCase):
             }})
 
     def test_duplicate_email(self):
+        self.POST('/HR/User', self.record,
+                  headers={'X-Filter': 'User.UserName'})
+        self.expect_status(201)
         # add duplicate email
         self.POST(
             '/HR/User',
@@ -227,7 +234,7 @@ digits and characters ".", "_", "\'", "-"'}
         self.expect_status(201)
         self.expect_json({
             'UserName': "johnphone",
-            'href': self.href(self.last_id+2)
+            'href': self.record_href
         })
 
     def test_missing_password(self):

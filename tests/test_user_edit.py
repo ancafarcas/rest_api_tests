@@ -53,13 +53,12 @@ class UserEditTestCase(ApiTestCase):
             {
               "FirstName": "JohnChanged",
               "LastName": "DoeChanged",
-              "UserName": "john12345._-'changed",
               "EMail": "john1.doe2.changed@email.com",
               "Password": "aaa3r546465676bgyhyyehy",
               "PhoneNumber":"+123123456789"
             }
             """,
-            headers={'X-Filter': 'User.UserName,User.FirstName,User.LastName,\
+            headers={'X-Filter': 'User.FirstName,User.LastName,\
 User.EMail,User.Password,User.PhoneNumber'}
         )
         self.expect_status(200)
@@ -68,7 +67,6 @@ User.EMail,User.Password,User.PhoneNumber'}
             'FirstName': 'JohnChanged',
             'LastName': 'DoeChanged',
             'PhoneNumber': '+123123456789',
-            'UserName': "john12345._-'changed",
             'href': self.record_href
         })
 
@@ -76,7 +74,6 @@ User.EMail,User.Password,User.PhoneNumber'}
         # username shouldn't be editable
         self.PUT(self.record_uri, {"UserName": "new_user_name"})
         self.expect_status(400)
-        self.inspect_json()
 
     def test_password(self):
         new_password = 'new_password'
