@@ -6,7 +6,7 @@ from unittest import TestCase, TextTestResult, TextTestRunner
 
 from api_test_tool.auth import log_in
 from api_test_tool.settings import (
-    SERVER_URL, PRINT_URL, XML_OUTPUT, VERBOSITY, PRINT_PAYLOAD,
+    SERVER_URL, PRINT_URL, VERBOSITY, PRINT_PAYLOAD,
     PRINT_DELIMITER)
 
 
@@ -52,7 +52,6 @@ class ApiTestRunner(TextTestRunner):
 
 class ApiTestCase(TestCase):
 
-
     maxDiff = None
 
     session = None
@@ -60,15 +59,24 @@ class ApiTestCase(TestCase):
     response = None
     server_url = SERVER_URL.rstrip('/')
 
-
     def _apply_path(self, json_dict, path):
-        if path:
-            path_elements = path.split('/')
-            for element in path_elements:
+        if not path:
+            return json_dict
+        path_elements = path.split('/')
+        for element in path_elements:
+            if element.startswith('['):
                 try:
-                    json_dict = json_dict[element]
-                except (IndexError, TypeError):
-                    self.fail("Path can't be applied")
+                    element = int(element.lstrip('[').rstrip(']'))
+                except ValueError as e:
+                    self.fail("Path can't be applied: {exception}."
+                              .format(exception=e.args))
+            try:
+                json_dict = json_dict[element]
+            except (IndexError, TypeError, KeyError):
+                self.fail(
+                    """Path can't be applied:
+no such index '{index}' in \"\"\"{dict}\"\"\"."""
+                    .format(index=element, dict=json_dict))
         return json_dict
 
     def _parse_json_input(self, json_dict):
@@ -145,8 +153,9 @@ class ApiTestCase(TestCase):
         json_dict = self._parse_json_response()
         return json_dict
 
-    def inspect_json(self):
-        pprint(self.json_response)
+    def inspect_json(self, path=None):
+        json_response = self._apply_path(self._parse_json_response(), path)
+        pprint(json_response)
 
     def inspect_body(self):
         pprint(self.response.text)
@@ -181,7 +190,7 @@ class ApiTestCase(TestCase):
     def expect_json(self, json_input, path=None, partly=False):
         """
         checks if json response equals some json,
-        path separated by slashes, ie 'foo/bar/spam'
+        path separated by slashes, ie 'foo/bar/spam', 'foo/[0]/bar'
         """
         json_input = self._parse_json_input(json_input)
         json_response = self._apply_path(self._parse_json_response(), path)
@@ -208,14 +217,14 @@ class ApiTestCase(TestCase):
     def expect_json_contains(self, json_input, path=None):
         """
         checks if json response contains some json subset,
-        path separated by slashes, ie 'foo/bar/spam'
+        path separated by slashes, ie 'foo/bar/spam', 'foo/[0]/bar'
         """
         self.expect_json(json_input, path, partly=True)
 
     def expect_json_length(self, length, path=None):
         """
         checks if count of objects in json response equals provided length,
-        path separated by slashes, ie 'foo/bar/spam'
+        path separated by slashes, ie 'foo/bar/spam', 'foo/[0]/bar'
         """
         json_response = self._apply_path(self._parse_json_response(), path)
         self.assertEqual(length, len(json_response),
