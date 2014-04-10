@@ -11,10 +11,6 @@ class UserMiscTestCase(ApiTestCase):
         return '/HR/User/{id}'.format(id=obj_id)
 
     @classmethod
-    def href(cls, obj_id):
-        return cls.server_url + cls.uri(obj_id)
-
-    @classmethod
     def setUpClass(cls):
         cls.last_id = fixtures.number('/HR/User')
 
@@ -41,7 +37,7 @@ class UserMiscTestCase(ApiTestCase):
     def test_user_logout(self):
         temporary_token = log_in()
         self.DELETE(
-            '/Security/Login/{token}/'.format(token=temporary_token),
+            '/Security/Login/{token}'.format(token=temporary_token),
             token=temporary_token)
         self.expect_status(200)
 

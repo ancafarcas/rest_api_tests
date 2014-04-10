@@ -31,8 +31,9 @@ class UserEditTestCase(ApiTestCase):
             ).hexdigest(),
             "PhoneNumber": "0223456789"
         }
-        cls.record_href = cls.href(cls.last_id+1)
-        cls.record_uri = cls.uri(cls.last_id+1)
+        cls.record_id = cls.last_id + 1
+        cls.record_href = cls.href(cls.record_id)
+        cls.record_uri = cls.uri(cls.record_id)
 
     def setUp(self):
         fixtures.init('/HR/User')
@@ -81,8 +82,9 @@ User.EMail,User.Password,User.PhoneNumber'}
             bytes(new_password, 'utf-8')
         ).hexdigest(),
         self.PUT(
-            self.record_uri,
-            {'Password': new_password_hashed})
+            '/HR/UserPassword/{id}'.format(id=self.record_id),
+            {'NewPassword': new_password_hashed,
+             'OldPassword': self.record['Password']})
         self.expect_status(200)
         # old password shouldn't work
         with self.assertRaises(ApiAuthException):
