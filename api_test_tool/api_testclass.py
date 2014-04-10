@@ -75,10 +75,9 @@ class ApiTestCase(TestCase):
         if isinstance(json_dict, str) \
            and ('{' in json_dict or '[' in json_dict):
             try:
-                response_dict = json.loads(self.response.text)
+                return json.loads(self.response.text)
             except ValueError:
                 self.fail('You have provided not a valid JSON.')
-        return json_dict
 
     def _parse_json_response(self):
         try:
@@ -87,14 +86,17 @@ class ApiTestCase(TestCase):
             self.fail('Response in not a valid JSON.')
         return response_dict
 
+    def get_url(self, uri):
+        return self.server_url + uri
 
     def request(self, method, uri, *args,
-                add_server=True, with_auth=True, **kwargs):
+                add_server=True, with_auth=True, token=None,
+                **kwargs):
         if not self.session:
             self.session = Session()
 
         if add_server:
-            url = self.server_url + uri
+            url = self.get_url(uri)
         else:
             url = uri
 
@@ -103,9 +105,11 @@ class ApiTestCase(TestCase):
         else:
             headers = {}
         if with_auth:
-            if not self.token:
-                self.token = log_in(session=self.session)
-            headers.update({'Authorization': self.token})
+            if not token:
+                if not self.token:
+                    self.token = log_in(session=self.session)
+                token = self.token
+            headers.update({'Authorization': token})
 
         if VERBOSITY == 2:
             if PRINT_URL:
@@ -156,7 +160,7 @@ class ApiTestCase(TestCase):
     def expect_status(self, code):
         self.assertEqual(
             code, self.response.status_code,
-            "Status code not matches.\nResponse body:\n{body}:"
+            "Status code not matches.\nResponse body:\n\"\"\"{body}\"\"\""
             .format(body=self.response.text))
 
     def expect_header(self, header, value, partly=False):
