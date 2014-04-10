@@ -83,7 +83,6 @@ User.EMail,User.Password,User.PhoneNumber'}
         self.PUT(
             self.record_uri,
             {'Password': new_password_hashed})
-        self.inspect_json()
         self.expect_status(200)
         # old password shouldn't work
         with self.assertRaises(ApiAuthException):
