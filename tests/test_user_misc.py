@@ -39,7 +39,7 @@ class UserMiscTestCase(ApiTestCase):
         self.DELETE(
             '/Security/Login/{token}'.format(token=temporary_token),
             token=temporary_token)
-        self.expect_status(200)
+        self.expect_status(204)
 
         self.GET('/HR/User', token=temporary_token)
         self.expect_status(401)
