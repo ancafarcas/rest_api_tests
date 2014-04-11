@@ -1,4 +1,4 @@
-from api_test_tool import ApiTestCase, log_in
+from api_test_tool import ApiTestCase
 from tests import fixtures, session, token
 
 
@@ -33,16 +33,3 @@ class UserMiscTestCase(ApiTestCase):
         # check user not exists
         self.GET(self.uri(self.last_id))
         self.expect_status(404)
-
-    def test_user_logout(self):
-        temporary_token = log_in()
-        self.DELETE(
-            '/Security/Login/{token}'.format(token=temporary_token),
-            token=temporary_token)
-        self.expect_status(204)
-
-        self.GET('/HR/User', token=temporary_token)
-        self.expect_status(401)
-        # just in case will check if it wasn't broken other token
-        self.GET('/HR/User')
-        self.expect_status(200)
