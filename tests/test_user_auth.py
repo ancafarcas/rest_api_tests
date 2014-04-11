@@ -3,7 +3,7 @@ from api_test_tool.auth import hash_token
 from api_test_tool.settings import LOGIN, PASS
 
 
-class AuthTestCase(ApiTestCase):
+class UserAuthTestCase(ApiTestCase):
 
     def test_login_incorrect_username(self):
         self.POST('/Security/Authentication', with_auth=False)
