@@ -59,11 +59,12 @@ class UserEditTestCase(ApiTestCase):
               "PhoneNumber":"+123123456789"
             }
             """,
-            headers={'X-Filter': 'User.FirstName,User.LastName,\
+            headers={'X-Filter': 'User.UserName,User.FirstName,User.LastName,\
 User.EMail,User.Password,User.PhoneNumber'}
         )
         self.expect_status(200)
         self.expect_json({
+            "UserName": "john12345._-'",
             'EMail': 'john1.doe2.changed@email.com',
             'FirstName': 'JohnChanged',
             'LastName': 'DoeChanged',
@@ -80,7 +81,7 @@ User.EMail,User.Password,User.PhoneNumber'}
         new_password = 'new_password'
         new_password_hashed = hashlib.sha512(
             bytes(new_password, 'utf-8')
-        ).hexdigest(),
+        ).hexdigest()
         self.PUT(
             '/HR/UserPassword/{id}'.format(id=self.record_id),
             {'NewPassword': new_password_hashed,
