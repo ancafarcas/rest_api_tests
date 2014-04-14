@@ -39,6 +39,9 @@ class UserAvatarTestCase(ApiTestCase):
 
     def test_avatar_upload(self):
         # change avatar for first user
+        print('debug==========================')
+        print(self.last_useravatar_uri)
+        print('===============================')
         with open(self.source_file, 'rb') as image_file:
             self.PUT(self.last_useravatar_uri, files=[
                 ('model', (
