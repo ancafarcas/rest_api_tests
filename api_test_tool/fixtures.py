@@ -15,7 +15,7 @@ class Fixtures():
     generated = {}
     session = None
     token = None
-    
+
     def __init__(self, file_path, session=None, token=None):
         try:
             with open(file_path, 'r') as f:
@@ -51,8 +51,7 @@ class Fixtures():
             + self.fixtures[path]["default_number"]
 
     def reset_app(self):
-        resp = self.session.put(self.server_url, verify=False,
-                                headers={'Authorization': self.token})
+        resp = self.session.put(self.server_url, verify=False)
         if resp.text != '' or resp.status_code != 200:
             raise FixturesException("Can't reset app.",
                                     resp.status_code, resp.text)
