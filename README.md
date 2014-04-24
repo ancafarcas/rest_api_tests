@@ -14,12 +14,13 @@ install dependencies:
 pip install -r requirements.txt
 ```
 
-### run blueprint tests:
-```
-python test_blueprint.py
-```
-
-### run func tests:
+### run tests:
 ```
 python test_runner.py
+```
+or
+
+```
+pip install nose
+nosetests
 ```
