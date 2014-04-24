@@ -1,8 +1,8 @@
 from unittest import TestLoader
 from xmlrunner import XMLTestRunner
 
-from api_test_tool import ApiTestRunner
-from api_test_tool.settings import XML_OUTPUT, VERBOSITY
+from aipom import ApiTestRunner
+from tests.settings import XML_OUTPUT
 
 
 if XML_OUTPUT:
@@ -10,8 +10,8 @@ if XML_OUTPUT:
 else:
     test_runner = ApiTestRunner
 
-PATTERN='test*.py'
-#PATTERN='*user_success*'
+PATTERN = 'test*.py'
+# PATTERN='*user_success*'
 if __name__ == '__main__':
     tests = TestLoader().discover(start_dir='./tests', pattern=PATTERN)
-    test_runner(verbosity=VERBOSITY).run(tests)
+    test_runner(verbosity=2).run(tests)

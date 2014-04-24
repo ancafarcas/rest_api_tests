@@ -1,12 +1,9 @@
-from unittest import main as start_tests
-from urllib.parse import quote
 import json
 import os
 from hashlib import md5
 from functools import partial
 
-from api_test_tool import ApiTestCase, ApiTestRunner
-from tests import fixtures, session, token
+from tests import fixtures, SuperdeskTestCase
 
 
 def md5sum(filename):
@@ -21,13 +18,10 @@ def md5sum(filename):
         return ''
 
 
-class UserAvatarTestCase(ApiTestCase):
+class UserAvatarTestCase(SuperdeskTestCase):
 
     source_file = './tests/test.png'
     result_file = '/tmp/output.png'
-
-    session = session
-    token = token
 
     def setUp(self):
         # reset app
@@ -88,8 +82,3 @@ class UserAvatarTestCase(ApiTestCase):
             md5sum(self.source_file),
             md5sum(self.result_file),
             "Images not matches.")
-
-
-# those lines shouldn't be in actual testcase:
-if __name__ == '__main__':
-    start_tests(verbosity=2, testRunner=ApiTestRunner)

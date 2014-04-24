@@ -1,10 +1,7 @@
-from api_test_tool import ApiTestCase
-from tests import fixtures, session, token
+from tests import fixtures, SuperdeskTestCase
 
 
-class UserSearchListTestCase(ApiTestCase):
-    session = session
-    token = token
+class UserSearchListTestCase(SuperdeskTestCase):
 
     @classmethod
     def setUpClass(cls):

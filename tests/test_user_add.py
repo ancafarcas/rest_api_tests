@@ -1,13 +1,10 @@
-from api_test_tool import ApiTestCase
-from api_test_tool.auth import log_in, ApiAuthException
 import hashlib
 
-from tests import fixtures, session, token
+from tests import fixtures, SuperdeskTestCase
+from tests.auth import get_token, ApiAuthException
 
 
-class UserAddTestCase(ApiTestCase):
-    session = session
-    token = token
+class UserAddTestCase(SuperdeskTestCase):
 
     @classmethod
     def uri(cls, obj_id):
@@ -50,8 +47,8 @@ class UserAddTestCase(ApiTestCase):
         })
         # log in with newly created user
         try:
-            log_in(username=self.record["UserName"],
-                   password=self.password),
+            get_token(username=self.record["UserName"],
+                      password=self.password),
         except ApiAuthException:
             self.fail("Newly created user can't log in.")
 
@@ -75,8 +72,8 @@ class UserAddTestCase(ApiTestCase):
         self.expect_json(self.record["UserName"], path="UserName")
 
         try:
-            log_in(username=self.record["UserName"],
-                   password=self.password)
+            get_token(username=self.record["UserName"],
+                      password=self.password),
         except ApiAuthException:
             self.fail("Newly created user can't log in.")
 

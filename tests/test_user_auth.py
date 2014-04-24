@@ -1,9 +1,9 @@
-from api_test_tool import ApiTestCase, log_in
-from api_test_tool.auth import hash_token
-from api_test_tool.settings import LOGIN, PASS
+from tests import SuperdeskTestCase
+from tests.auth import hash_token, get_token
+from tests.settings import LOGIN, PASS
 
 
-class UserAuthTestCase(ApiTestCase):
+class UserAuthTestCase(SuperdeskTestCase):
 
     def test_login_incorrect_username(self):
         self.POST('/Security/Authentication', with_auth=False)
@@ -58,7 +58,7 @@ a16f96e4ae763a1bf1a858dad4701fecc35f73785cc397ac54487d30da3313a0d7e5f4'},
             {"other": {"invalid": {"msg": "Invalid credentials"}}})
 
     def test_logout(self):
-        temporary_token = log_in()
+        temporary_token = get_token()
         self.DELETE(
             '/Security/Login/{token}'.format(token=temporary_token),
             token=temporary_token)

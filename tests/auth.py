@@ -3,7 +3,7 @@ import hashlib
 import hmac
 import json
 
-from api_test_tool.settings import SERVER_URL, LOGIN, PASS
+from tests.settings import SERVER_URL, LOGIN, PASS
 
 
 server_url = SERVER_URL.rstrip('/')
@@ -28,7 +28,7 @@ def hash_token(username, password, token):
     return hashed_token
 
 
-def log_in(username=LOGIN, password=PASS, session=None):
+def get_token(username=LOGIN, password=PASS, session=None):
     if session is None:
         session = Session()
 

@@ -1,13 +1,10 @@
-from api_test_tool import ApiTestCase
-from api_test_tool.auth import log_in, ApiAuthException
 import hashlib
 
-from tests import fixtures, session, token
+from tests import fixtures, SuperdeskTestCase
+from tests.auth import get_token, ApiAuthException
 
 
-class UserEditTestCase(ApiTestCase):
-    session = session
-    token = token
+class UserEditTestCase(SuperdeskTestCase):
 
     @classmethod
     def uri(cls, obj_id):
@@ -89,12 +86,12 @@ User.EMail,User.Password,User.PhoneNumber'}
         self.expect_status(200)
         # old password shouldn't work
         with self.assertRaises(ApiAuthException):
-            log_in(username=self.record["UserName"],
-                   password=self.password)
+            get_token(username=self.record["UserName"],
+                      password=self.password)
         # new password should work
         try:
-            log_in(username=self.record["UserName"],
-                   password=new_password)
+            get_token(username=self.record["UserName"],
+                      password=new_password)
         except ApiAuthException:
             self.fail("User can't log in with the new password.")
 

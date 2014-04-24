@@ -1,8 +1,8 @@
 import json
 from requests import Session
 
-from api_test_tool.settings import SERVER_URL
-from api_test_tool.auth import log_in
+from tests.settings import SERVER_URL
+from tests.auth import get_token
 
 
 class FixturesException(Exception):
@@ -30,7 +30,7 @@ class Fixtures():
         if token:
             self.token = token
         else:
-            self.token = log_in(session=self.session)
+            self.token = get_token(session=self.session)
 
     def _upload_record(self, path, record):
         resp = self.session.post(self.server_url + path, verify=False,
