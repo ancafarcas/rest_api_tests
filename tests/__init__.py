@@ -8,11 +8,14 @@ from tests.fixtures import Fixtures
 from tests.auth import get_token
 from tests.settings import SERVER_URL, PRINT_PAYLOAD, PRINT_URL
 
+
+pwd = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+FIXTURES_PATH = os.path.join(pwd, './fixtures.json')
+
+
 session = Session()
 token = get_token(session=session)
-PWD = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-fixtures = Fixtures(os.path.join(PWD, './fixtures.json'),
-                    session=session, token=token)
+fixtures = Fixtures(FIXTURES_PATH, session=session, token=token)
 
 
 class SuperdeskTestCase(ApiTestCase):

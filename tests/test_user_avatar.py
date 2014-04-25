@@ -32,10 +32,7 @@ class UserAvatarTestCase(SuperdeskTestCase):
             id=fixtures.last_id('/HR/User'))
 
     def test_avatar_upload(self):
-        # change avatar for first user
-        print('debug==========================')
-        print(self.last_useravatar_uri)
-        print('===============================')
+        # change avatar for the last user
         with open(self.source_file, 'rb') as image_file:
             self.PUT(self.last_useravatar_uri, files=[
                 ('model', (

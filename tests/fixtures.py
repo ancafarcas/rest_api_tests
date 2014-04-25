@@ -78,7 +78,7 @@ class Fixtures():
 
     def init(self, path, number=None):
         self.reset_app()
-        self.upload(path, number=None)
+        self.upload(path, number)
 
     def init_all(self):
         for path in self.fixtures:
