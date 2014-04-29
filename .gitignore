@@ -2,3 +2,5 @@ env/
 settings_local.py
 __pycache__/
 *.bak
+.project
+.pydevproject
