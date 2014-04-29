@@ -1,13 +1,11 @@
-from api_test_tool import ApiTestCase
-from api_test_tool.auth import log_in, ApiAuthException
 import hashlib
+import os
 
-from tests import fixtures, session, token
+from tests import fixtures, SuperdeskTestCase
+from tests.auth import get_token, ApiAuthException
 
 
-class UserAddTestCase(ApiTestCase):
-    session = session
-    token = token
+class UserAddTestCase(SuperdeskTestCase):
 
     @classmethod
     def uri(cls, obj_id):
@@ -31,60 +29,49 @@ class UserAddTestCase(ApiTestCase):
             ).hexdigest(),
             "PhoneNumber": "0223456789"
         }
-        cls.record_href = cls.href(cls.last_id+1)
-        cls.record_uri = cls.uri(cls.last_id+1)
 
     def setUp(self):
         fixtures.init('/HR/User')
-
-    def test_success(self):
         # add user
-        self.POST(
-            '/HR/User',
-            self.record,
-            headers={'X-Filter': 'User.UserName'})
+        self.POST('/HR/User', self.record,
+                  headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
         self.expect_json({
-            'UserName': self.record["UserName"],
-            'href': self.record_href
-        })
+            'UserName': self.record["UserName"]
+        }, partly=True)
+        
+        self.record_href = self.json_response['href']
+        self.record_id = int(os.path.basename(self.record_href))
+        self.record_uri = self.uri(self.record_id)
+
+    def test_success(self):
+        # check if user is created
+        self.GET(self.uri(self.record_id))
+        self.expect_status(200)
+    
         # log in with newly created user
         try:
-            log_in(username=self.record["UserName"],
-                   password=self.password),
+            get_token(username=self.record["UserName"],
+                      password=self.password),
         except ApiAuthException:
             self.fail("Newly created user can't log in.")
 
     def test_already_deleted(self):
-        # add user
-        self.POST(
-            '/HR/User',
-            self.record,
-            headers={'X-Filter': 'User.UserName'})
-        self.expect_status(201)
-        self.expect_json({
-            'UserName': self.record["UserName"],
-            'href': self.record_href
-        })
-        # add deleted one
+        # add deleted user
         self.DELETE(self.record_uri)
         self.expect_status(204)
         self.POST('/HR/User', self.record,
                   headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
-        self.expect_json(self.record["UserName"], path="UserName")
-
+        self.expect_json(self.record["UserName"])
+  
         try:
-            log_in(username=self.record["UserName"],
-                   password=self.password)
+            get_token(username=self.record["UserName"],
+                      password=self.password),
         except ApiAuthException:
             self.fail("Newly created user can't log in.")
-
+  
     def test_duplicate_username(self):
-        # add user
-        self.POST('/HR/User', self.record,
-                  headers={'X-Filter': 'User.UserName'})
-        self.expect_status(201)
         # add duplicate username
         self.POST(
             '/HR/User',
@@ -102,11 +89,8 @@ class UserAddTestCase(ApiTestCase):
             {'UserName': {'conflict':
                 {'msg': 'There is already an active user with this name'}
             }})
-
+ 
     def test_duplicate_email(self):
-        self.POST('/HR/User', self.record,
-                  headers={'X-Filter': 'User.UserName'})
-        self.expect_status(201)
         # add duplicate email
         self.POST(
             '/HR/User',
@@ -124,7 +108,7 @@ class UserAddTestCase(ApiTestCase):
             {'EMail': {'unique':
                 {'msg': 'Unique constraint failed'}
             }})
-
+ 
     def test_incorrect_username(self):
         # add incorrect username
         self.POST(
@@ -145,7 +129,7 @@ class UserAddTestCase(ApiTestCase):
                  'example': 'The user name must contain only letters, \
 digits and characters ".", "_", "\'", "-"'}
             }})
-
+ 
     def test_incorrect_email(self):
         # add incorrect email
         self.POST(
@@ -164,7 +148,7 @@ digits and characters ".", "_", "\'", "-"'}
             {'EMail': {'format':
                 {'msg': 'Invalid EMail'}
             }})
-
+ 
     def test_missing_first_name(self):
         # add missing first name
         self.POST(
@@ -182,7 +166,7 @@ digits and characters ".", "_", "\'", "-"'}
             {'FirstName': {'mandatory':
                 {'msg': 'Mandatory value is missing'}
             }})
-
+ 
     def test_missing_last_name(self):
         # add missing last name
         self.POST(
@@ -200,7 +184,7 @@ digits and characters ".", "_", "\'", "-"'}
             {'LastName': {'mandatory':
                 {'msg': 'Mandatory value is missing'}
             }})
-
+ 
     def test_missing_email(self):
         # add missing email
         self.POST(
@@ -218,7 +202,7 @@ digits and characters ".", "_", "\'", "-"'}
             {'EMail': {'mandatory':
                 {'msg': 'Mandatory value is missing'}
             }})
-
+ 
     def test_missing_phone(self):
         # add missing phone
         self.POST(
@@ -236,7 +220,7 @@ digits and characters ".", "_", "\'", "-"'}
             'UserName': "johnphone",
             'href': self.record_href
         })
-
+ 
     def test_missing_password(self):
         # missing password
         self.POST(

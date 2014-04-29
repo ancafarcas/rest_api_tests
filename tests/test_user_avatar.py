@@ -1,12 +1,9 @@
-from unittest import main as start_tests
-from urllib.parse import quote
 import json
 import os
 from hashlib import md5
 from functools import partial
 
-from api_test_tool import ApiTestCase, ApiTestRunner
-from tests import fixtures, session, token
+from tests import fixtures, SuperdeskTestCase
 
 
 def md5sum(filename):
@@ -17,17 +14,14 @@ def md5sum(filename):
             for buf in iter(partial(f.read, 128), b''):
                 d.update(buf)
             return d.hexdigest()
-    except FileNotFoundError:
+    except OSError.FileNotFoundError:
         return ''
 
 
-class UserAvatarTestCase(ApiTestCase):
+class UserAvatarTestCase(SuperdeskTestCase):
 
     source_file = './tests/test.png'
     result_file = '/tmp/output.png'
-
-    session = session
-    token = token
 
     def setUp(self):
         # reset app
@@ -38,10 +32,7 @@ class UserAvatarTestCase(ApiTestCase):
             id=fixtures.last_id('/HR/User'))
 
     def test_avatar_upload(self):
-        # change avatar for first user
-        print('debug==========================')
-        print(self.last_useravatar_uri)
-        print('===============================')
+        # change avatar for the last user
         with open(self.source_file, 'rb') as image_file:
             self.PUT(self.last_useravatar_uri, files=[
                 ('model', (
@@ -88,8 +79,3 @@ class UserAvatarTestCase(ApiTestCase):
             md5sum(self.source_file),
             md5sum(self.result_file),
             "Images not matches.")
-
-
-# those lines shouldn't be in actual testcase:
-if __name__ == '__main__':
-    start_tests(verbosity=2, testRunner=ApiTestRunner)

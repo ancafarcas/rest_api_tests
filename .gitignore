@@ -1,3 +1,6 @@
 env/
 settings_local.py
 __pycache__/
+*.bak
+README.md
+requirements.txt
