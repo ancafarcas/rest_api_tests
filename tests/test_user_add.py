@@ -131,9 +131,8 @@ class UserAddTestCase(SuperdeskTestCase):
         self.expect_json(
             {'UserName': {'user name':
                           {'msg': 'Invalid user name format',
-                           'example': 'The user name must contain'
-                           'only letters, \
-                            digits and characters ".", "_", "\'", "-"'}
+                           'example': 'The user name must contain only letters, \
+digits and characters ".", "_", "\'", "-"'}
                           }
              }
         )

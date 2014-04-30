@@ -93,4 +93,4 @@ class UserSearchListTestCase(SuperdeskTestCase):
         self.expect_status(200)
 
         self.expect_json(self.number_of_users, 'total')
-        self.expect_json_length(self.number_of_users, path='collection')
+        self.expect_json_length('total', path='collection')
