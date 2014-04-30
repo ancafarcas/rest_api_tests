@@ -4,6 +4,7 @@ from tests import fixtures, SuperdeskTestCase
 from tests.auth import get_token, ApiAuthException
 from os.path import os
 
+
 class UserAddTestCase(SuperdeskTestCase):
 
     @classmethod
@@ -38,7 +39,7 @@ class UserAddTestCase(SuperdeskTestCase):
         self.expect_json({
             'UserName': self.record["UserName"]
         }, partly=True)
-        
+
         self.record_href = self.json_response['href']
         self.record_id = int(os.path.basename(self.record_href))
         self.record_uri = self.uri(self.record_id)
@@ -63,13 +64,13 @@ class UserAddTestCase(SuperdeskTestCase):
                   headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
         self.expect_json(self.record["UserName"])
- 
+
         try:
             get_token(username=self.record["UserName"],
                       password=self.password),
         except ApiAuthException:
             self.fail("Newly created user can't log in.")
- 
+
     def test_duplicate_username(self):
         # add duplicate username
         self.POST(
@@ -86,9 +87,12 @@ class UserAddTestCase(SuperdeskTestCase):
         self.expect_status(400)
         self.expect_json(
             {'UserName': {'conflict':
-                {'msg': 'There is already an active user with this name'}
-            }})
- 
+                          {'msg': 'There is already an active'
+                           'user with this name'}
+                          }
+             }
+        )
+
     def test_duplicate_email(self):
         # add duplicate email
         self.POST(
@@ -105,9 +109,11 @@ class UserAddTestCase(SuperdeskTestCase):
         self.expect_status(400)
         self.expect_json(
             {'EMail': {'unique':
-                {'msg': 'Unique constraint failed'}
-            }})
- 
+                       {'msg': 'Unique constraint failed'}
+                       }
+             }
+        )
+
     def test_incorrect_username(self):
         # add incorrect username
         self.POST(
@@ -124,10 +130,13 @@ class UserAddTestCase(SuperdeskTestCase):
         self.expect_status(400)
         self.expect_json(
             {'UserName': {'user name':
-                {'msg': 'Invalid user name format',
-                 'example': 'The user name must contain only letters, \
-digits and characters ".", "_", "\'", "-"'}
-            }})
+                          {'msg': 'Invalid user name format',
+                           'example': 'The user name must contain'
+                           'only letters, \
+                            digits and characters ".", "_", "\'", "-"'}
+                          }
+             }
+        )
 
     def test_incorrect_email(self):
         # add incorrect email
@@ -145,9 +154,11 @@ digits and characters ".", "_", "\'", "-"'}
         self.expect_status(400)
         self.expect_json(
             {'EMail': {'format':
-                {'msg': 'Invalid EMail'}
-            }})
- 
+                       {'msg': 'Invalid EMail'}
+                       }
+             }
+        )
+
     def test_missing_first_name(self):
         # add missing first name
         self.POST(
@@ -163,8 +174,10 @@ digits and characters ".", "_", "\'", "-"'}
         self.expect_status(400)
         self.expect_json(
             {'FirstName': {'mandatory':
-                {'msg': 'Mandatory value is missing'}
-            }})
+                           {'msg': 'Mandatory value is missing'}
+                           }
+             }
+        )
 
     def test_missing_last_name(self):
         # add missing last name
@@ -181,8 +194,10 @@ digits and characters ".", "_", "\'", "-"'}
         self.expect_status(400)
         self.expect_json(
             {'LastName': {'mandatory':
-                {'msg': 'Mandatory value is missing'}
-            }})
+                          {'msg': 'Mandatory value is missing'}
+                          }
+             }
+        )
 
     def test_missing_email(self):
         # add missing email
@@ -199,9 +214,11 @@ digits and characters ".", "_", "\'", "-"'}
         self.expect_status(400)
         self.expect_json(
             {'EMail': {'mandatory':
-                {'msg': 'Mandatory value is missing'}
-            }})
- 
+                       {'msg': 'Mandatory value is missing'}
+                       }
+             }
+        )
+
     def test_missing_phone(self):
         # add missing phone
         self.POST(
@@ -235,5 +252,7 @@ digits and characters ".", "_", "\'", "-"'}
         self.expect_status(400)
         self.expect_json(
             {'Password': {'mandatory':
-                {'msg': 'Mandatory value is missing'}
-            }})
+                          {'msg': 'Mandatory value is missing'}
+                          }
+             }
+        )
