@@ -2,6 +2,7 @@ import hashlib
 
 from tests import fixtures, SuperdeskTestCase
 from tests.auth import get_token, ApiAuthException
+from os.path import os
 
 
 class UserEditTestCase(SuperdeskTestCase):
@@ -28,9 +29,6 @@ class UserEditTestCase(SuperdeskTestCase):
             ).hexdigest(),
             "PhoneNumber": "0223456789"
         }
-        cls.record_id = cls.last_id + 1
-        cls.record_href = cls.href(cls.record_id)
-        cls.record_uri = cls.uri(cls.record_id)
 
     def setUp(self):
         fixtures.init('/HR/User')
@@ -39,9 +37,12 @@ class UserEditTestCase(SuperdeskTestCase):
                   headers={'X-Filter': 'User.UserName'})
         self.expect_status(201)
         self.expect_json({
-            'UserName': self.record["UserName"],
-            'href': self.record_href
-        })
+            'UserName': self.record["UserName"]
+            }, partly=True)
+        
+        self.record_href = self.json_response['href']
+        self.record_id = int(os.path.basename(self.record_href))
+        self.record_uri = self.uri(self.record_id)
 
     def test_success(self):
         # edit with success, check new values, check login
@@ -73,7 +74,7 @@ User.EMail,User.Password,User.PhoneNumber'}
         # username shouldn't be editable
         self.PUT(self.record_uri, {"UserName": "new_user_name"})
         self.expect_status(400)
-
+ 
     def test_password(self):
         new_password = 'new_password'
         new_password_hashed = hashlib.sha512(
@@ -94,7 +95,7 @@ User.EMail,User.Password,User.PhoneNumber'}
                       password=new_password)
         except ApiAuthException:
             self.fail("User can't log in with the new password.")
-
+ 
     def test_duplicate_email(self):
         self.POST(
             '/HR/User',
@@ -111,17 +112,17 @@ User.EMail,User.Password,User.PhoneNumber'}
         self.expect_json({
             'UserName': 'john2',
             'href': self.href(self.last_id+2)})
-
+ 
         self.PUT(
-            self.uri(self.last_id+2),
-            {"EMail": "john1.doe2@email.com"},
+            self.uri(self.record_id),
+            {"EMail": "john2.doe@email.com"},
             headers={'X-Filter': 'User.UserName,User.EMail'})
         self.expect_status(400)
         self.expect_json(
             {'EMail': {'unique':
                 {'msg': 'Unique constraint failed'}
             }})
-
+ 
     def test_incorect_email(self):
         self.PUT(
             self.record_uri,
@@ -131,7 +132,7 @@ User.EMail,User.Password,User.PhoneNumber'}
             {'EMail': {'format':
                 {'msg': 'Invalid EMail'}
             }})
-
+ 
     def test_missing_first_name(self):
         self.PUT(
             self.record_uri,
@@ -142,7 +143,7 @@ User.EMail,User.Password,User.PhoneNumber'}
             {'FirstName': {'mandatory':
                 {'msg': 'Mandatory value is missing'}
             }})
-
+ 
     def test_missing_last_name(self):
         self.PUT(
             self.record_uri,
@@ -153,7 +154,7 @@ User.EMail,User.Password,User.PhoneNumber'}
             {'LastName': {'mandatory':
                 {'msg': 'Mandatory value is missing'}
             }})
-
+ 
     def test_missing_email(self):
         self.PUT(
             self.record_uri,
@@ -180,7 +181,7 @@ User.EMail,User.Password,User.PhoneNumber'}
     def test_deleted(self):
         self.DELETE(self.record_uri)
         self.expect_status(204)
-
+ 
         self.PUT(
             self.record_uri,
             {"FirstName": 'FirstName'},
